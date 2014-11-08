@@ -1,0 +1,22 @@
+{
+  "name": "pipeline",
+  "version": "0.0.1",
+  "description": "a flux library with some differences",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rimunroe/pipeline.git"
+  },
+  "keywords": [
+    "flux"
+  ],
+  "author": "Richard Munroe",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rimunroe/pipeline/issues"
+  },
+  "homepage": "https://github.com/rimunroe/pipeline"
+}
