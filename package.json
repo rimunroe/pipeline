@@ -2,7 +2,7 @@
   "name": "pipeline",
   "version": "0.0.1",
   "description": "a flux library with some differences",
-  "main": "index.js",
+  "main": "pipeline.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
