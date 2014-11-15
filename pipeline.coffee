@@ -73,7 +73,7 @@ pipeline =
         else if Array.isArray options.after then options.after
         else []
 
-      newStore =
+      store =
         key: key
         stores: @stores
 
@@ -92,17 +92,17 @@ pipeline =
 
       for actionKey, callback of options.actions
 
-        @dispatcher.register key, actionKey, after, callback.bind(newStore)
+        @dispatcher.register key, actionKey, after, callback.bind(store)
 
-      @stores[key] = newStore
-      return newStore
+      @stores[key] = store
+      return store
 
     createAdapter: (options) ->
       app = this
-      newAdapter = {}
+      adapter = {}
       for storeKey, callback of options.stores
-        @stores[storeKey].register callback, newAdapter
+        @stores[storeKey].register callback, adapter
 
-      @adapters.push newAdapter
+      @adapters.push adapter
 
-      return newAdapter
+      return adapter
