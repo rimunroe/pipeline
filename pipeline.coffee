@@ -2,10 +2,7 @@ _ = require 'lodash'
 
 pipeline =
   createApp: ->
-    dispatcher:
-      callbacks: {}
-
-      _sortDependencies: (unsorted) ->
+    _sortDependencies = (unsorted) ->
         sorted = _.filter unsorted, (action) -> _.isEmpty action.after
         sortedOrder = _.pluck sorted, 'storeKey'
         if _.isEmpty sorted then return false
@@ -25,6 +22,10 @@ pipeline =
 
         return sorted
 
+
+    dispatcher:
+      callbacks: {}
+
       register: (storeKey, actionKey, after, callback) ->
         unless @callbacks[actionKey]? then @callbacks[actionKey] = []
 
@@ -39,7 +40,7 @@ pipeline =
           callback: callback
 
         unless missingDependency
-          sortedCallbacks = @_sortDependencies(@callbacks[actionKey])
+          sortedCallbacks = _sortDependencies(@callbacks[actionKey])
           if sortedCallbacks is false
             @callbacks[actionKey].pop()
             throw new Error "store \"#{storeKey}\"'s action \"#{actionKey}\" creates a circular dependency"
