@@ -22,7 +22,6 @@ module.exports =
 
       return sorted
 
-
     dispatcher =
       callbacks: {}
 
