@@ -14,7 +14,7 @@
     "flux"
   ],
   "author": "Richard Munroe",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/rimunroe/pipeline/issues"
   },
