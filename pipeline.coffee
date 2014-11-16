@@ -106,7 +106,6 @@ pipeline =
       return store
 
     createAdapter: (options) ->
-      app = this
       adapter = {}
       for storeKey, callback of options.stores
         @stores[storeKey].register callback, adapter
