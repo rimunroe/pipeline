@@ -23,7 +23,7 @@ module.exports =
       return sorted
 
 
-    dispatcher:
+    dispatcher =
       callbacks: {}
 
       register: (storeKey, actionKey, after, callback) ->
@@ -61,7 +61,7 @@ module.exports =
       @actions[actionKey] = (args...) =>
         payload = packager.apply(null, args)
         if payload isnt false
-          @dispatcher.sendAction(actionKey, payload)
+          dispatcher.sendAction(actionKey, payload)
         else console.log("wtf mate")
 
     createStore: (key, options) ->
@@ -99,7 +99,7 @@ module.exports =
           waitFor = _.unique after.concat(action.after)
           callback = action.action
 
-        @dispatcher.register key, actionKey, waitFor, callback.bind(store)
+        dispatcher.register key, actionKey, waitFor, callback.bind(store)
 
 
       @stores[key] = store
