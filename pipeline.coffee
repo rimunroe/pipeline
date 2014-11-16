@@ -3,24 +3,24 @@ _ = require 'lodash'
 pipeline =
   createApp: ->
     _sortDependencies = (unsorted) ->
-        sorted = _.filter unsorted, (action) -> _.isEmpty action.after
-        sortedOrder = _.pluck sorted, 'storeKey'
-        if _.isEmpty sorted then return false
-        working = _.difference unsorted, sorted
+      sorted = _.filter unsorted, (action) -> _.isEmpty action.after
+      sortedOrder = _.pluck sorted, 'storeKey'
+      if _.isEmpty sorted then return false
+      working = _.difference unsorted, sorted
 
-        until _.isEmpty working
-          cyclic = true
+      until _.isEmpty working
+        cyclic = true
 
-          for action in working when _.every(action.after, (dep) -> dep in sortedOrder)
-            cyclic = false
-            sorted.push action
-            sortedOrder.push action.storeKey
+        for action in working when _.every(action.after, (dep) -> dep in sortedOrder)
+          cyclic = false
+          sorted.push action
+          sortedOrder.push action.storeKey
 
-          return false if cyclic
+        return false if cyclic
 
-          working = _.difference working, sorted
+        working = _.difference working, sorted
 
-        return sorted
+      return sorted
 
 
     dispatcher:
