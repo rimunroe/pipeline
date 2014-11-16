@@ -98,7 +98,12 @@ module.exports =
           waitFor = _.unique after.concat(action.after)
           callback = action.action
 
-        dispatcher.register key, actionKey, waitFor, callback.bind(store)
+        fn = (payload, options) ->
+          store.action = if _.isObject(payload) then payload else {}
+          callback.call store
+          store.action = {}
+
+        dispatcher.register key, actionKey, waitFor, fn
 
 
       @stores[key] = store
