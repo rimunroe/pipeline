@@ -92,8 +92,15 @@ pipeline =
         unregister: (callback, context) -> _.remove callbacks, {callback: callback, context: context}
 
       for actionKey, action of options.actions
+        if typeof action is 'function'
+          waitFor = after
+          callback = action
+        else
+          waitFor = _.unique after.concat(action.after)
+          callback = action.action
 
-        @dispatcher.register key, actionKey, after, action.bind(store)
+        @dispatcher.register key, actionKey, waitFor, callback.bind(store)
+
 
       @stores[key] = store
       return store
