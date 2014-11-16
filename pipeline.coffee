@@ -78,6 +78,8 @@ module.exports =
         else if Array.isArray options.after then options.after
         else []
 
+      if key in after then throw new Error "store \"#{key}\" waits for itself"
+
       store =
         key: key
 
@@ -99,6 +101,8 @@ module.exports =
           waitFor = after
           callback = action
         else
+          if key is action.after or key in action.after
+            throw new Error "on action \"#{actionKey}\", store \"#{key}\" waits for itself to update"
           waitFor = _.unique after.concat(action.after)
           callback = action.action
 
