@@ -91,9 +91,9 @@ pipeline =
         register: (callback, context) -> callbacks.push {callback: callback, context: context}
         unregister: (callback, context) -> _.remove callbacks, {callback: callback, context: context}
 
-      for actionKey, callback of options.actions
+      for actionKey, action of options.actions
 
-        @dispatcher.register key, actionKey, after, callback.bind(store)
+        @dispatcher.register key, actionKey, after, action.bind(store)
 
       @stores[key] = store
       return store
