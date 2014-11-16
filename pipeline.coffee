@@ -4,8 +4,8 @@ module.exports =
   createApp: ->
     _sortDependencies = (unsorted) ->
       sorted = _.filter unsorted, (action) -> _.isEmpty action.after
-      sortedOrder = _.pluck sorted, 'storeKey'
       if _.isEmpty sorted then return false
+      sortedOrder = _.pluck sorted, 'storeKey'
       working = _.difference unsorted, sorted
 
       until _.isEmpty working
