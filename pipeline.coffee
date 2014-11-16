@@ -1,6 +1,6 @@
 _ = require 'lodash'
 
-module.exports = ->
+module.exports =
   createApp: ->
     _sortDependencies = (unsorted) ->
       sorted = _.filter unsorted, (action) -> _.isEmpty action.after
