@@ -2,6 +2,11 @@ _ = require 'lodash'
 
 module.exports =
   createApp: ->
+    _keyObj = (array, callback) ->
+      obj = {}
+      for key in array then obj[key] = callback(key)
+      return obj
+
     _sortDependencies = (unsorted) ->
       sorted = _.filter unsorted, (action) -> _.isEmpty action.after
       if _.isEmpty sorted then return false
@@ -73,9 +78,10 @@ module.exports =
         else if Array.isArray options.after then options.after
         else []
 
+      if key in after then throw new Error "store \"#{key}\" waits for itself"
+
       store =
         key: key
-        stores: @stores
 
         trigger: ->
           for obj in callbacks
@@ -95,11 +101,14 @@ module.exports =
           waitFor = after
           callback = action
         else
+          if key is action.after or key in action.after
+            throw new Error "on action \"#{actionKey}\", store \"#{key}\" waits for itself to update"
           waitFor = _.unique after.concat(action.after)
           callback = action.action
 
-        fn = (payload, options) ->
+        fn = (payload, options) =>
           store.action = if _.isObject(payload) then payload else {}
+          store.stores = _keyObj(waitFor, (key) => @stores[key])
           callback.call store
           store.action = {}
 
