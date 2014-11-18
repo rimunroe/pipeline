@@ -28,35 +28,49 @@ module.exports =
       return sorted
 
     dispatcher =
-      callbacks: {}
+      actionCallbacks: {}
+      storeCallbacks: {}
+      changedStores: {}
 
-      register: (storeKey, actionKey, after, callback) ->
-        unless @callbacks[actionKey]? then @callbacks[actionKey] = []
+      onAction: (storeKey, actionKey, after, callback) ->
+        unless @actionCallbacks[actionKey]? then @actionCallbacks[actionKey] = []
 
-        unless _.every(after, (dep) => _.find(@callbacks[actionKey], (action) ->
+        unless _.every(after, (dep) => _.find(@actionCallbacks[actionKey], (action) ->
           dep is action.storeKey
         ))
           missingDependency = true
 
-        @callbacks[actionKey].push
+        @actionCallbacks[actionKey].push
           storeKey: storeKey
           after: after or []
           callback: callback
 
         unless missingDependency
-          sortedCallbacks = _sortDependencies(@callbacks[actionKey])
+          sortedCallbacks = _sortDependencies(@actionCallbacks[actionKey])
           if sortedCallbacks is false
-            @callbacks[actionKey].pop()
+            @actionCallbacks[actionKey].pop()
             throw new Error "store \"#{storeKey}\"'s action \"#{actionKey}\" creates a circular dependency"
           else
-            @callbacks[actionKey] = sortedCallbacks
+            @actionCallbacks[actionKey] = sortedCallbacks
+
+      onStoreChange: (storeKey, adapterKey, callback) ->
+        @storeCallbacks[storeKey] ?= []
+        @storeCallbacks[storeKey].push
+          adapterKey: adapterKey
+          callback: callback
+
+      storeHasChanged: (storeKey) ->
+        @changedStores[storeKey] = true
 
       sendAction: (actionKey, payload) ->
-        for cb in @callbacks[actionKey] then cb.callback(payload)
+        @changedStores = {}
+        for cb in @actionCallbacks[actionKey] then cb.callback(payload)
+        for storeKey, val of @changedStores when @storeCallbacks[storeKey]?
+          for cb in @storeCallbacks[storeKey] then cb.callback()
 
     actions: {}
     stores: {}
-    adapters: []
+    adapters: {}
 
     createActions: (actionObject) ->
       _.forEach actionObject, (packager, actionKey) => @createAction(actionKey, packager)
@@ -83,9 +97,7 @@ module.exports =
       store =
         key: key
 
-        trigger: ->
-          for obj in callbacks
-            obj.callback.call(obj.context)
+        trigger: -> dispatcher.storeHasChanged(@key)
 
         get: (key) -> _.cloneDeep if key? then data[key] else data
 
@@ -112,17 +124,18 @@ module.exports =
           callback.call store
           store.action = {}
 
-        dispatcher.register key, actionKey, waitFor, fn
+        dispatcher.onAction key, actionKey, waitFor, fn
 
+      for name, callback of options.api then store.api[name] = callback.bind _context
 
       @stores[key] = store
       return store
 
-    createAdapter: (options) ->
-      adapter = {}
+    createAdapter: (key, options) ->
+      adapter = key: key
       for storeKey, callback of options.stores
-        @stores[storeKey].register callback, adapter
+        dispatcher.onStoreChange storeKey, key, callback
 
-      @adapters.push adapter
+      @adapters[key] = adapter
 
       return adapter
