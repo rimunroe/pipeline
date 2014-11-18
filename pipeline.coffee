@@ -126,8 +126,6 @@ module.exports =
 
         dispatcher.onAction key, actionKey, waitFor, fn
 
-      for name, callback of options.api then store.api[name] = callback.bind _context
-
       @stores[key] = store
       return store
 
