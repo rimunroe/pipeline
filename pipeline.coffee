@@ -83,7 +83,6 @@ module.exports =
         else console.log("wtf mate")
 
     createStore: (key, options) ->
-      stores = @stores
       callbacks = []
       data = {}
 
@@ -94,8 +93,10 @@ module.exports =
 
       if key in after then throw new Error "store \"#{key}\" waits for itself"
 
-      store =
+      _context =
         key: key
+
+        api: {}
 
         trigger: -> dispatcher.storeHasChanged(@key)
 
@@ -105,8 +106,13 @@ module.exports =
           for key, val of updates then data[key] = val
           @trigger()
 
-        register: (callback, context) -> callbacks.push {callback: callback, context: context}
-        unregister: (callback, context) -> _.remove callbacks, {callback: callback, context: context}
+      store =
+        get: (key) -> _.cloneDeep if key? then data[key] else data
+
+      for name, callback of options.api when name isnt 'get'
+        cb = callback.bind(_context)
+        _context.api[name] = cb
+        store[name] = cb
 
       for actionKey, action of options.actions
         if typeof action is 'function'
@@ -119,10 +125,10 @@ module.exports =
           callback = action.action
 
         fn = (payload, options) =>
-          store.action = if _.isObject(payload) then payload else {}
-          store.stores = _keyObj(waitFor, (key) => @stores[key])
-          callback.call store
-          store.action = {}
+          _context.action = if _.isObject(payload) then payload else {}
+          _context.stores = _keyObj(waitFor, (key) => @stores[key])
+          callback.call _context
+          _context.action = {}
 
         dispatcher.onAction key, actionKey, waitFor, fn
 
