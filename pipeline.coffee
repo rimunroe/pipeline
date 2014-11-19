@@ -55,11 +55,14 @@ module.exports =
           else
             @actionCallbacks[actionKey] = sortedCallbacks
 
-      onStoreChange: (storeKey, adapterKey, callback) ->
+      registerStoreCallback: (storeKey, adapterKey, callback) ->
         @storeCallbacks[storeKey] ?= []
         @storeCallbacks[storeKey].push
           adapterKey: adapterKey
           callback: callback
+
+      unregisterStoreCallback: (storeKey, callback) ->
+        _.remove @storeCallbacks[storeKey], callback
 
       storeHasChanged: (storeKey) ->
         @changedStores[storeKey] = true
@@ -154,4 +157,14 @@ module.exports =
           _context[name] = property.bind(_context)
 
       for storeKey, callback of options.stores
-        dispatcher.onStoreChange storeKey, key, callback.bind(_context)
+        dispatcher.registerStoreCallback storeKey, key, callback.bind(_context)
+
+    reactMixin: (stores) ->
+      componentDidMount: ->
+        for storeKey in stores
+          StoreKey = storeKey.charAt(0).toUpperCase() + storeKey.slice(1)
+          dispatcher.registerStoreCallback storeKey, 'react-view', @["on#{StoreKey}Change"]
+      componentWillUnmount: ->
+        for storeKey in stores
+          StoreKey = storeKey.charAt(0).toUpperCase() + storeKey.slice(1)
+          dispatcher.unregisterStoreCallback storeKey, @["on#{StoreKey}Change"]
