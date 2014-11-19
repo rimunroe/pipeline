@@ -27,6 +27,8 @@ module.exports =
 
       return sorted
 
+    isDispatching = false
+
     dispatcher =
       actionCallbacks: {}
       storeCallbacks: {}
@@ -63,14 +65,20 @@ module.exports =
         @changedStores[storeKey] = true
 
       sendAction: (actionKey, payload) ->
+        if isDispatching
+          throw new Error "already dispatching!"
+        else isDispatching = true
+
         @changedStores = {}
-        for cb in @actionCallbacks[actionKey] then cb.callback(payload)
+        if @actionCallbacks[actionKey]?
+          for cb in @actionCallbacks[actionKey] then cb.callback(payload)
         for storeKey, val of @changedStores when @storeCallbacks[storeKey]?
           for cb in @storeCallbacks[storeKey] then cb.callback()
 
+        isDispatching = false
+
     actions: {}
     stores: {}
-    adapters: {}
 
     createActions: (actionObject) ->
       _.forEach actionObject, (packager, actionKey) => @createAction(actionKey, packager)
@@ -136,10 +144,14 @@ module.exports =
       return store
 
     createAdapter: (key, options) ->
-      adapter = key: key
+      _context =
+        key: key
+        stores: @stores
+        actions: @actions
+
+      for name, property of options when name isnt 'stores'
+        if typeof property is 'function'
+          _context[name] = property.bind(_context)
+
       for storeKey, callback of options.stores
-        dispatcher.onStoreChange storeKey, key, callback
-
-      @adapters[key] = adapter
-
-      return adapter
+        dispatcher.onStoreChange storeKey, key, callback.bind(_context)
