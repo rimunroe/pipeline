@@ -160,7 +160,9 @@ module.exports =
         dispatcher.registerStoreCallback storeKey, key, callback.bind(_context)
 
     reactMixin: (stores) ->
-      stores: _.filter @stores, (store) -> store.key in stores
+      storesObj = {}
+      for storeKey in stores then storesObj[storeKey] = @stores[storeKey]
+      stores: storesObj
 
       componentDidMount: ->
         for storeKey in stores
