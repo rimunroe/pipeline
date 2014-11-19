@@ -160,10 +160,13 @@ module.exports =
         dispatcher.registerStoreCallback storeKey, key, callback.bind(_context)
 
     reactMixin: (stores) ->
+      stores: _.filter @stores, (store) -> store.key in stores
+
       componentDidMount: ->
         for storeKey in stores
           StoreKey = storeKey.charAt(0).toUpperCase() + storeKey.slice(1)
           dispatcher.registerStoreCallback storeKey, 'react-view', @["on#{StoreKey}Change"]
+
       componentWillUnmount: ->
         for storeKey in stores
           StoreKey = storeKey.charAt(0).toUpperCase() + storeKey.slice(1)
