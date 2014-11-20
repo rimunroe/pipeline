@@ -7,22 +7,22 @@ Put in data -> alter application state -> read from state.
 Design Intent
 =============
 
-Pipeline is a framework for creating flux applications.  Flux is a pretty general pattern, and Pipeline is a pretty oppinionated version of it.
+Pipeline is a framework for creating flux applications. Flux is a pretty general pattern, and Pipeline is a pretty oppinionated version of it.
 
-It's not built to solve everyone's problems, it's built to see how far the conceptual straightforwardness and declarative nature of flux can be taken.  This means straightforward when writing starting the app, but also straightforward when you, your team, and new people find your code 3 months later and have to figure out what the hell it's doing.  particular parts of pipeline may feel verbose at first, but we assure you, 3-months-from-now-you will be very happy about that mild verbosity.
+It's not built to solve everyone's problems, it's built to see how far the conceptual straightforwardness and declarative nature of flux can be taken. This means straightforward when writing starting the app, but also straightforward when you, your team, and new people find your code 3 months later and have to figure out what the hell it's doing. particular parts of pipeline may feel verbose at first, but we assure you, 3-months-from-now-you will be very happy about that mild verbosity.
 
 Pipeline apps are built with three types of objects:  `actions`, `stores`, and `adapters`.
 
 (note:  When referring to React Components as 'just DOM adaptors' is funny to you, you have now groked pipeline.)
 
-The pipeline app should maintain the canonical representation of state for the entire application.   This includes application data, UI state, routing/location state, everything.
+The pipeline app should maintain the canonical representation of state for the entire application. This includes application data, UI state, routing/location state, everything.
 
 
 #### Pipeline Objects
 
 ##### Actions
 
-Actions are functions that pass data into the system.  They have some special properties.
+Actions are functions that pass data into the system. They have some special properties.
 
 * They can be called from any context.
 * They cannot be called while another action is being processed.
@@ -38,7 +38,7 @@ Properties of Stores:
 * Stores broadcast a change event which allows subscribed adaptors to process the new state of the application.
 * All store state processing is done syncronously
 
-The secret sauce of stores is that they can delcare that for an action, they must resolve after some other store.  This ensures that if a store calls a getter of another store during its action resulution, then the result is garuanteed to be the new state of that store.
+The secret sauce of stores is that they can delcare that for an action, they must resolve after some other store. This ensures that if a store calls a getter of another store during its action resulution, then the result is garuanteed to be the new state of that store.
 
 Store change events are triggered only after all stores have resolved, so subscribed adapters and views are garaunteed to get the new state of the applicaion via getters.
 
@@ -53,7 +53,7 @@ Adapters are how the pipeline app interacts with world outside of pipeline.
 Using Pipeline
 ==============
 
-Pipeline provides the constructors `createAction()`, `createStore()`, `createAdapter()`, and for conveneince, `createActions()` because it's common to declare many actions and they're small.  They all do what you'd expect them to do.
+Pipeline provides the constructors `createAction()`, `createStore()`, `createAdapter()`, and for conveneince, `createActions()` because it's common to declare many actions and they're small. They all do what you'd expect them to do.
 
 #### Create your App
 
@@ -134,7 +134,7 @@ The packager function converts the arugments passed into the action into an payl
 App.createAction 'someAction', (foo, bar) -> foo:foo, bar:bar
 ```
 
-The packager can do simple syntatic validation on the arguments, but any symantic or domain logic should live with the subscribed stores.  If an action packager doesn't return an object, then the action will not be passed to the stores.
+The packager can do simple syntatic validation on the arguments, but any symantic or domain logic should live with the subscribed stores. If an action packager doesn't return an object, then the action will not be passed to the stores.
 
 ```coffee
 App.createAction 'someAction', (foo, bar) ->
@@ -145,10 +145,10 @@ Because actions are small and often declared in groups, `createActions(object)` 
 
 ```coffee
 App.createActions
- foo: (foo) -> foo:foo
- bar: (bar) -> bar:bar
- nameSpace:
-   baz: (baz) -> baz:baz
+  foo: (foo) -> foo:foo
+  bar: (bar) -> bar:bar
+  nameSpace:
+    baz: (baz) -> baz:baz
 ```
 These actions would then be available
 
@@ -175,7 +175,7 @@ Adapters can be bi-diretional, they can also (4) listen to events events outside
 
 examples:
 
-a `historyAdapter` listens to the canonical state for your application in some sort of `locationStore` and pushes to the history when appropriate.  This adaptor would also listen to popstate events and fire navigation actions when the user changes the url.
+a `historyAdapter` listens to the canonical state for your application in some sort of `locationStore` and pushes to the history when appropriate. This adaptor would also listen to popstate events and fire navigation actions when the user changes the url.
 
 a 'networkAdapter' listens to the state of a store and makes network calls accordingly.
 
@@ -198,9 +198,9 @@ HW = pipeline.createApp()
 ## Component Reference
 
 Things in Pipeline:
-* [App](https://github.com/rimunroe/pipeline/wiki/App)
-* [Actions](https://github.com/rimunroe/pipeline/wiki/Actions)
-* [Stores](https://github.com/rimunroe/pipeline/wiki/Stores)
-* [Adapters](https://github.com/rimunroe/pipeline/wiki/Adapters)
-* [Views](https://github.com/rimunroe/pipeline/wiki/Vies)
+* [App](App)
+* [Actions](Actions)
+* [Stores](Stores)
+* [Adapters](Adapters)
+* [Views](Views)
 
