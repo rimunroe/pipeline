@@ -202,5 +202,3 @@ Things in Pipeline:
 * [Actions](https://github.com/rimunroe/pipeline/wiki/Actions)
 * [Stores](https://github.com/rimunroe/pipeline/wiki/Stores)
 * [Adapters](https://github.com/rimunroe/pipeline/wiki/Adapters)
-* [Views](https://github.com/rimunroe/pipeline/wiki/Views)
-
