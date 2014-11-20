@@ -1,6 +1,4 @@
-_ = require 'lodash'
-
-module.exports =
+pipeline =
   createApp: ->
     _keyObj = (array, callback) ->
       obj = {}
@@ -89,9 +87,7 @@ module.exports =
     createAction: (actionKey, packager) ->
       @actions[actionKey] = (args...) =>
         payload = packager.apply(null, args)
-        if payload isnt false
-          dispatcher.sendAction(actionKey, payload)
-        else console.log("wtf mate")
+        dispatcher.sendAction(actionKey, if typeof payload is 'object' else {})
 
     createStore: (key, options) ->
       callbacks = []
@@ -117,15 +113,18 @@ module.exports =
           for key, val of updates then data[key] = val
           @trigger()
 
+      stores = @stores
+
       store =
         get: (key) -> _.cloneDeep if key? then data[key] else data
 
-      for name, callback of options.api when name isnt 'get'
-        cb = callback.bind(_context)
-        _context.api[name] = cb
-        store[name] = cb
+      _.forEach options.api, (callback, name) ->
+        if name isnt 'get'
+          cb = callback.bind(_context)
+          _context.api[name] = cb
+          store[name] = cb
 
-      for actionKey, action of options.actions
+      _.forEach options.actions, (action, actionKey) ->
         if typeof action is 'function'
           waitFor = after
           callback = action
@@ -135,9 +134,9 @@ module.exports =
           waitFor = _.unique after.concat(action.after)
           callback = action.action
 
-        fn = (payload, options) =>
+        fn = (payload) ->
           _context.action = if _.isObject(payload) then payload else {}
-          _context.stores = _keyObj(waitFor, (key) => @stores[key])
+          _context.stores = _keyObj(waitFor, (key) -> stores[key])
           callback.call _context
           _context.action = {}
 
@@ -162,7 +161,9 @@ module.exports =
     reactMixin: (stores) ->
       storesObj = {}
       for storeKey in stores then storesObj[storeKey] = @stores[storeKey]
+
       stores: storesObj
+      actions: @actions
 
       componentDidMount: ->
         for storeKey in stores
