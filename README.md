@@ -7,7 +7,7 @@ Put in data -> alter application state -> read from state.
 Design Intent
 =============
 
-Pipeline is a framework for creating flux applications. Flux is a pretty general pattern, and Pipeline is a pretty oppinionated version of it.
+Pipeline is a framework for creating flux applications. Flux is a pretty general pattern, and Pipeline is a pretty opinionated version of it.
 
 It's not built to solve everyone's problems, it's built to see how far the conceptual straightforwardness and declarative nature of flux can be taken. This means straightforward when writing starting the app, but also straightforward when you, your team, and new people find your code 3 months later and have to figure out what the hell it's doing. particular parts of pipeline may feel verbose at first, but we assure you, 3-months-from-now-you will be very happy about that mild verbosity.
 
