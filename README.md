@@ -198,9 +198,9 @@ HW = pipeline.createApp()
 ## Component Reference
 
 Things in Pipeline:
-* [App](App)
-* [Actions](Actions)
-* [Stores](Stores)
-* [Adapters](Adapters)
-* [Views](Views)
+* [App](https://github.com/rimunroe/pipeline/wiki/App)
+* [Actions](https://github.com/rimunroe/pipeline/wiki/Actions)
+* [Stores](https://github.com/rimunroe/pipeline/wiki/Stores)
+* [Adapters](https://github.com/rimunroe/pipeline/wiki/Adapters)
+* [Views](https://github.com/rimunroe/pipeline/wiki/Vies)
 
