@@ -199,8 +199,8 @@ HW = pipeline.createApp()
 
 Things in Pipeline:
 * [App](https://github.com/rimunroe/pipeline/wiki/App)
-* [Actions](https://github.com/rimunroe/pipeline/wiki/App)
-* [Stores](https://github.com/rimunroe/pipeline/wiki/App)
-* [Adapters](https://github.com/rimunroe/pipeline/wiki/App)
-* [Views](https://github.com/rimunroe/pipeline/wiki/App)
+* [Actions](https://github.com/rimunroe/pipeline/wiki/Actions)
+* [Stores](https://github.com/rimunroe/pipeline/wiki/Stores)
+* [Adapters](https://github.com/rimunroe/pipeline/wiki/Adapters)
+* [Views](https://github.com/rimunroe/pipeline/wiki/Views)
 
