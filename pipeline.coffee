@@ -89,7 +89,7 @@ pipeline =
     createAction: (actionKey, packager) ->
       @actions[actionKey] = (args...) =>
         payload = packager.apply(null, args)
-        dispatcher.sendAction(actionKey, if typeof payload is 'object' else {})
+        dispatcher.sendAction(actionKey, if typeof payload is 'object' then payload else {})
 
     createStore: (key, options) ->
       callbacks = []
