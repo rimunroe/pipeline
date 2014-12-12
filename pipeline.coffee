@@ -161,6 +161,7 @@ pipeline =
         dispatcher.registerStoreCallback storeKey, key, callback.bind(_context)
 
     reactMixin: (stores) ->
+      if _.isString(stores) then stores = [stores]
       storesObj = {}
       for storeKey in stores then storesObj[storeKey] = @stores[storeKey]
 
