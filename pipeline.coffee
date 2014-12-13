@@ -111,8 +111,11 @@ pipeline =
 
         get: (key) -> _.cloneDeep if key? then data[key] else data
 
-        update: (updates) ->
-          for key, val of updates then data[key] = val
+        update: (updates, value) ->
+          if typeof updates is 'object'
+            for key, val of updates then data[key] = val
+          else if typeof updates is 'string'
+            data[updates] = value
           @trigger()
 
       stores = @stores
