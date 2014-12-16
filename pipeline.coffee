@@ -179,9 +179,11 @@ pipeline =
       componentDidMount: ->
         for storeKey in stores
           StoreKey = storeKey.charAt(0).toUpperCase() + storeKey.slice(1)
-          dispatcher.registerStoreCallback storeKey, 'react-view', @["on#{StoreKey}Change"]
+          cb = @["on#{StoreKey}Change"]
+          if _.isFunction(cb) then dispatcher.registerStoreCallback storeKey, 'react-view', cb
 
       componentWillUnmount: ->
         for storeKey in stores
           StoreKey = storeKey.charAt(0).toUpperCase() + storeKey.slice(1)
-          dispatcher.unregisterStoreCallback storeKey, @["on#{StoreKey}Change"]
+          cb = @["on#{StoreKey}Change"]
+          if _.isFunction(cb) then dispatcher.unregisterStoreCallback storeKey, cb
