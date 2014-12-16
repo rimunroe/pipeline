@@ -97,3 +97,5 @@ gulp.task "release-npm", ["release-gem"], shell.task(["npm publish"],
   cwd: "./npm"
 )
 gulp.task "publish", ["release-npm"]
+
+gulp.task 'default', ['build']
