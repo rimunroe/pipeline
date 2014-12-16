@@ -102,9 +102,12 @@ pipeline =
 
       if key in after then throw new Error "store \"#{key}\" waits for itself"
 
+      reservedKeys = _.intersection(_.keys(options), ['stores', 'key', 'trigger', 'get', 'update'])
 
+      unless _.isEmpty reservedKeys then _.each reservedKeys, (reservedKey) ->
+        throw new Error "In \"#{key}\" Store: \"#{reservedKey}\" is a reserved key and cannot be used."
 
-      _context = _.omit options, ['api', 'actions', 'stores', 'key', 'trigger', 'get', 'update']
+      _context = _.omit options,['api', 'actions']
 
       _.each _context, (prop, key) -> if _.isFunction(prop) then _context[key] = prop.bind(_context)
 
