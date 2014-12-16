@@ -102,15 +102,17 @@ pipeline =
 
       if key in after then throw new Error "store \"#{key}\" waits for itself"
 
-      _context =
+
+
+      _context = _.omit options, ['api', 'actions', 'stores', 'key', 'trigger', 'get', 'update']
+
+      _.each _context, (prop, key) -> if _.isFunction(prop) then _context[key] = prop.bind(_context)
+
+      _.extend _context,
         key: key
-
         api: {}
-
         trigger: -> dispatcher.storeHasChanged(@key)
-
-        get: (key) -> _.cloneDeep if key? then data[key] else data
-
+        get: (key) -> _.clone if key? then data[key] else data
         update: (updates, value) ->
           if typeof updates is 'object'
             for key, val of updates then data[key] = val
