@@ -1,5 +1,3 @@
-_ = require 'lodash'
-
 pipeline =
   createApp: ->
     _keyObj = (array, callback) ->

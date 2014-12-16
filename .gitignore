@@ -1,1 +1,7 @@
 node_modules/
+rails/app/assets/javascripts/pipeline.js
+rails/app/assets/javascripts/pipeline.min.js
+npm/pipeline.js
+npm/pipeline.min.js
+bower/pipeline.js
+bower/pipeline.min.js

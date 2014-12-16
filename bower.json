@@ -1,0 +1,30 @@
+{
+  "name": "pipeline",
+  "version": "0.0.1",
+  "homepage": "https://github.com/rimunroe/pipeline",
+  "authors": [
+    "Richard Munroe"
+  ],
+  "main": "bower/pipeline.js",
+  "moduleType": [
+    "globals",
+    "node"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "dist",
+    "gulpfile.js",
+    "npm",
+    "package.json",
+    "rails",
+    "src"
+  ],
+  "dependencies": {
+    "lodash": "~2.4.1"
+  },
+  "keywords": [
+    "flux"
+  ]
+}
