@@ -42,7 +42,7 @@ gulp.task 'prepare-npm', [
 ]
 
 gulp.task 'set-gem-version', ->
-  gemVersionModule = "module pipeline\n  VERSION = '" + version() + "'\nend"
+  gemVersionModule = "module Pipeline\n  VERSION = '" + version() + "'\nend"
   fs.writeFileSync './rails/lib/pipeline/version.rb', gemVersionModule
 
 gulp.task 'copy-gem-javascript', ->
