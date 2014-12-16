@@ -3,3 +3,17 @@ rails/app/assets/javascripts/pipeline.js
 rails/app/assets/javascripts/pipeline.min.js
 npm/pipeline.js
 npm/pipeline.min.js
+rails/.bundle/
+rails/.yardoc
+rails/Gemfile.lock
+rails/_yardoc/
+rails/coverage/
+rails/doc/
+rails/pkg/
+rails/spec/reports/
+rails/tmp/
+*.bundle
+*.so
+*.o
+*.a
+mkmf.log
