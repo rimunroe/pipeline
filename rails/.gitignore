@@ -12,3 +12,5 @@
 *.o
 *.a
 mkmf.log
+app/assets/javascripts/pipeline.js
+app/assets/javascripts/pipeline.min.js
