@@ -1,5 +1,8 @@
 pipeline =
-  createApp: ->
+  createApp: (appOptions) ->
+    appOptions =
+      debug: if appOptions.debug then true else false
+
     _keyObj = (array, callback) ->
       obj = {}
       for key in array then obj[key] = callback(key)
@@ -149,6 +152,8 @@ pipeline =
           _context.action = {}
 
         dispatcher.onAction key, actionKey, waitFor, fn
+
+      if appOptions.debug then store._ctx = _context
 
       @stores[key] = store
       return store
