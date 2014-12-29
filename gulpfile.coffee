@@ -35,9 +35,14 @@ gulp.task 'copy-npm-javascript', ->
   gulp.src 'dist/*.js'
     .pipe gulp.dest './npm'
 
+gulp.task 'copy-npm-readme', ->
+  gulp.src './README.md'
+    .pipe gulp.dest './npm'
+
 gulp.task 'prepare-npm', [
   'set-npm-version'
   'copy-npm-javascript'
+  'copy-npm-readme'
 ]
 
 gulp.task 'set-bower-version', ->
