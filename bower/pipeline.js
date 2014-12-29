@@ -106,32 +106,38 @@
           return this.changedStores[storeKey] = true;
         },
         sendAction: function(actionKey, payload) {
-          var cb, storeKey, val, _i, _j, _len, _len1, _ref, _ref1, _ref2;
-          if (isDispatching) {
-            throw new Error("already dispatching!");
-          } else {
-            isDispatching = true;
-          }
-          this.changedStores = {};
-          if (this.actionCallbacks[actionKey] != null) {
-            _ref = this.actionCallbacks[actionKey];
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              cb = _ref[_i];
-              cb.callback(payload);
-            }
-          }
-          _ref1 = this.changedStores;
-          for (storeKey in _ref1) {
-            val = _ref1[storeKey];
-            if (this.storeCallbacks[storeKey] != null) {
-              _ref2 = this.storeCallbacks[storeKey];
-              for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
-                cb = _ref2[_j];
-                cb.callback();
+          var _send;
+          _send = (function(_this) {
+            return function() {
+              var cb, storeKey, val, _i, _j, _len, _len1, _ref, _ref1, _ref2;
+              isDispatching = true;
+              _this.changedStores = {};
+              if (_this.actionCallbacks[actionKey] != null) {
+                _ref = _this.actionCallbacks[actionKey];
+                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                  cb = _ref[_i];
+                  cb.callback(payload);
+                }
               }
-            }
+              _ref1 = _this.changedStores;
+              for (storeKey in _ref1) {
+                val = _ref1[storeKey];
+                if (_this.storeCallbacks[storeKey] != null) {
+                  _ref2 = _this.storeCallbacks[storeKey];
+                  for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
+                    cb = _ref2[_j];
+                    cb.callback();
+                  }
+                }
+              }
+              return isDispatching = false;
+            };
+          })(this);
+          if (isDispatching) {
+            return _.defer(_send);
+          } else {
+            return _send();
           }
-          return isDispatching = false;
         }
       };
       return {
@@ -302,6 +308,16 @@
               return _results;
             }
           };
+        },
+        start: function(appInit) {
+          console.log('starting, initializers: ', this.initializers);
+          _.each(this.initializers, function(init) {
+            return init();
+          });
+          delete this.initializers;
+          if (_.isFunction(appInit)) {
+            return appInit.call(this);
+          }
         }
       };
     }
