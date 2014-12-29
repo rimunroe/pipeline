@@ -1,6 +1,7 @@
 node_modules/
 npm/pipeline.js
 npm/pipeline.min.js
+dist/
 *.bundle
 *.so
 *.o
