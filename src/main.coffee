@@ -66,17 +66,18 @@ pipeline =
         @changedStores[storeKey] = true
 
       sendAction: (actionKey, payload) ->
-        if isDispatching
-          throw new Error "already dispatching!"
-        else isDispatching = true
+        _send = =>
+          isDispatching = true
+          @changedStores = {}
 
-        @changedStores = {}
-        if @actionCallbacks[actionKey]?
-          for cb in @actionCallbacks[actionKey] then cb.callback(payload)
-        for storeKey, val of @changedStores when @storeCallbacks[storeKey]?
-          for cb in @storeCallbacks[storeKey] then cb.callback()
+          if @actionCallbacks[actionKey]?
+            for cb in @actionCallbacks[actionKey] then cb.callback(payload)
+          for storeKey, val of @changedStores when @storeCallbacks[storeKey]?
+            for cb in @storeCallbacks[storeKey] then cb.callback()
 
-        isDispatching = false
+          isDispatching = false
+
+        if isDispatching then _.defer _send else _send()
 
     actions: {}
     stores: {}
