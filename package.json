@@ -1,6 +1,6 @@
 {
   "name": "pipeline",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A tiny Flux framework with strong opinions",
   "main": "dist/pipeline.js",
   "scripts": {
