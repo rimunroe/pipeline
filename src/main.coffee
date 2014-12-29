@@ -186,3 +186,10 @@ pipeline =
           StoreKey = storeKey.charAt(0).toUpperCase() + storeKey.slice(1)
           cb = @["on#{StoreKey}Change"]
           if _.isFunction(cb) then dispatcher.unregisterStoreCallback storeKey, cb
+
+    start: (appInit) ->
+      console.log('starting, initializers: ', @initializers)
+      _.each @initializers, (init) -> init()
+      delete @initializers
+      if _.isFunction(appInit) then appInit.call(this)
+
