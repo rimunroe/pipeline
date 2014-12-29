@@ -50,7 +50,7 @@
           }
           if (cyclic) {
             return false;
-          }sdsd
+          }
           working = _.difference(working, sorted);
         }
         return sorted;
