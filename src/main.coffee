@@ -144,10 +144,8 @@ pipeline =
           callback = action.action
 
         fn = (payload) ->
-          _context.action = if _.isObject(payload) then payload else {}
           _context.stores = _keyObj(waitFor, (key) -> stores[key])
-          callback.call _context
-          _context.action = {}
+          callback.call _context, payload
 
         dispatcher.onAction key, actionKey, waitFor, fn
 
