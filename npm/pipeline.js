@@ -229,12 +229,10 @@
               callback = action.action;
             }
             fn = function(payload) {
-              _context.action = _.isObject(payload) ? payload : {};
               _context.stores = _keyObj(waitFor, function(key) {
                 return stores[key];
               });
-              callback.call(_context);
-              return _context.action = {};
+              return callback.call(_context, payload);
             };
             return dispatcher.onAction(key, actionKey, waitFor, fn);
           });

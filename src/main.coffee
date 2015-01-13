@@ -144,7 +144,7 @@ pipeline =
           callback = action.action
 
         fn = (payload) ->
-          _context.stores = _keyObj(waitFor, (key) -> stores[key])
+          _context.stores = _keyObj waitFor, (key) -> stores[key]
           callback.call _context, payload
 
         dispatcher.onAction key, actionKey, waitFor, fn
