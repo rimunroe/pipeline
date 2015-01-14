@@ -115,7 +115,7 @@ pipeline =
 
       if key in after then throw new Error "store \"#{key}\" waits for itself"
 
-      reservedKeys = _.intersection(_.keys(options), ['stores', 'key', 'trigger', 'get', 'update'])
+      reservedKeys = _.intersection(_.keys(options), ['stores', 'key', 'get', 'update'])
 
       unless _.isEmpty reservedKeys then _.each reservedKeys, (reservedKey) ->
         throw new Error "In \"#{key}\" Store: \"#{reservedKey}\" is a reserved key and cannot be used."
@@ -124,14 +124,15 @@ pipeline =
 
       _.each _context, (prop, key) -> if _.isFunction(prop) then _context[key] = prop.bind(_context)
 
+      _trigger = -> dispatcher.storeHasChanged key
+
       _.extend _context,
         key: key
         api: {}
-        trigger: -> dispatcher.storeHasChanged(@key)
         get: (key) -> _.clone if key? then data[key] else data
         update: (updates, value) ->
           _mutate updates, value
-          @trigger()
+          _trigger()
 
       stores = @stores
 
@@ -161,7 +162,9 @@ pipeline =
         dispatcher.onAction key, actionKey, waitFor, fn
 
       if _.isFunction(options.initialize)
-        _initializers.stores.push options.initialize.bind _.omit _context, 'actions'
+        _initContext = _.omit _context, ['actions', 'update']
+        _initContext.update = _mutate
+        _initializers.stores.push options.initialize.bind _initContext
 
       @stores[key] = store
       return store
