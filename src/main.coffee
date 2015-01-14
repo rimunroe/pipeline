@@ -157,7 +157,8 @@ pipeline =
 
         dispatcher.onAction key, actionKey, waitFor, fn
 
-      if _.isFunction(options.initialize) then _initializers.stores.push options.initialize.bind(_context)
+      if _.isFunction(options.initialize)
+        _initializers.stores.push options.initialize.bind _.omit _context, 'actions'
 
       @stores[key] = store
       return store
@@ -177,7 +178,7 @@ pipeline =
       @contexts.push _context
 
       if _.isFunction(options.initialize)
-        _initializers.adapters.push options.initialize.bind(_context)
+        _initializers.adapters.push options.initialize.bind _.omit _context, 'actions'
 
     contexts: []
 
