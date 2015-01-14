@@ -29,7 +29,7 @@ pipeline =
 
       return sorted
 
-    isDispatching = false
+    canDispatch = false
 
     dispatcher =
       actionCallbacks: {}
@@ -71,7 +71,7 @@ pipeline =
 
       sendAction: (actionKey, payload) ->
         _send = =>
-          isDispatching = true
+          canDispatch = true
           @changedStores = {}
 
           if @actionCallbacks[actionKey]?
@@ -79,9 +79,9 @@ pipeline =
           for storeKey, val of @changedStores when @storeCallbacks[storeKey]?
             for cb in @storeCallbacks[storeKey] then cb.callback()
 
-          isDispatching = false
+          canDispatch = false
 
-        if isDispatching then _.defer _send else _send()
+        if canDispatch then _.defer _send else _send()
 
       runStoreCallbacks: ->
         for storeKey, val of @changedStores when @storeCallbacks[storeKey]?
@@ -206,4 +206,5 @@ pipeline =
       _.each _initializers.stores, (init) -> init()
       _.each _initializers.adapters, (init) -> init()
       dispatcher.runStoreCallbacks()
+      canDispatch = true
       if _.isFunction(appInit) then appInit.call(this)
