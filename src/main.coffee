@@ -203,9 +203,11 @@ pipeline =
           if _.isFunction(cb) then dispatcher.unregisterStoreCallback storeKey, cb
 
     start: (appInit) ->
-      console.log('starting, initializers: ', _initializers)
       _.each _initializers.stores, (init) -> init()
       _.each _initializers.adapters, (init) -> init()
+
       dispatcher.runStoreCallbacks()
+
       canDispatch = true
+
       if _.isFunction(appInit) then appInit.call(this)
