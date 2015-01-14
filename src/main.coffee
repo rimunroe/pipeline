@@ -81,7 +81,7 @@ pipeline =
 
           canDispatch = false
 
-        if canDispatch then _.defer _send else _send()
+        if canDispatch then _send() else _.defer _send
 
       runStoreCallbacks: ->
         for storeKey, val of @changedStores when @storeCallbacks[storeKey]?
