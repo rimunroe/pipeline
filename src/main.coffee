@@ -102,6 +102,12 @@ pipeline =
       callbacks = []
       data = {}
 
+      _mutate = (updates, value) ->
+        if typeof updates is 'object'
+          for key, val of updates then data[key] = val
+        else if typeof updates is 'string'
+          data[updates] = value
+
       after =
         if typeof options.after is 'string' then [options.after]
         else if Array.isArray options.after then options.after
@@ -124,10 +130,7 @@ pipeline =
         trigger: -> dispatcher.storeHasChanged(@key)
         get: (key) -> _.clone if key? then data[key] else data
         update: (updates, value) ->
-          if typeof updates is 'object'
-            for key, val of updates then data[key] = val
-          else if typeof updates is 'string'
-            data[updates] = value
+          _mutate updates, value
           @trigger()
 
       stores = @stores
