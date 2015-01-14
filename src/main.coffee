@@ -1,5 +1,9 @@
 pipeline =
   createApp: ->
+    _initializers =
+      stores: []
+      adapters: []
+
     _keyObj = (array, callback) ->
       obj = {}
       for key in array then obj[key] = callback(key)
@@ -79,6 +83,10 @@ pipeline =
 
         if isDispatching then _.defer _send else _send()
 
+      runStoreCallbacks: ->
+        for storeKey, val of @changedStores when @storeCallbacks[storeKey]?
+          for cb in @storeCallbacks[storeKey] then cb.callback()
+
     actions: {}
     stores: {}
 
@@ -106,7 +114,7 @@ pipeline =
       unless _.isEmpty reservedKeys then _.each reservedKeys, (reservedKey) ->
         throw new Error "In \"#{key}\" Store: \"#{reservedKey}\" is a reserved key and cannot be used."
 
-      _context = _.omit options,['api', 'actions']
+      _context = _.omit options, ['initialize', 'api', 'actions']
 
       _.each _context, (prop, key) -> if _.isFunction(prop) then _context[key] = prop.bind(_context)
 
@@ -149,6 +157,8 @@ pipeline =
 
         dispatcher.onAction key, actionKey, waitFor, fn
 
+      if _.isFunction(options.initialize) then _initializers.stores.push options.initialize.bind(_context)
+
       @stores[key] = store
       return store
 
@@ -158,12 +168,18 @@ pipeline =
         stores: @stores
         actions: @actions
 
-      for name, property of options when name isnt 'stores'
-        if typeof property is 'function'
-          _context[name] = property.bind(_context)
+      for name, property of _.omit options, ['stores', 'initialize']
+        if _.isFunction(property) then _context[name] = property.bind(_context)
 
       for storeKey, callback of options.stores
         dispatcher.registerStoreCallback storeKey, key, callback.bind(_context)
+
+      @contexts.push _context
+
+      if _.isFunction(options.initialize)
+        _initializers.adapters.push options.initialize.bind(_context)
+
+    contexts: []
 
     reactMixin: (stores) ->
       if _.isString(stores) then stores = [stores]
@@ -186,8 +202,8 @@ pipeline =
           if _.isFunction(cb) then dispatcher.unregisterStoreCallback storeKey, cb
 
     start: (appInit) ->
-      console.log('starting, initializers: ', @initializers)
-      _.each @initializers, (init) -> init()
-      delete @initializers
+      console.log('starting, initializers: ', _initializers)
+      _.each _initializers.stores, (init) -> init()
+      _.each _initializers.adapters, (init) -> init()
+      dispatcher.runStoreCallbacks()
       if _.isFunction(appInit) then appInit.call(this)
-
