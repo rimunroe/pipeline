@@ -182,12 +182,9 @@ pipeline =
       for storeKey, callback of options.stores
         dispatcher.registerStoreCallback storeKey, key, callback.bind(_context)
 
-      @contexts.push _context
-
       if _.isFunction(options.initialize)
         _initializers.adapters.push options.initialize.bind _.omit _context, 'actions'
 
-    contexts: []
 
     reactMixin: (stores) ->
       if _.isString(stores) then stores = [stores]
