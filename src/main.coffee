@@ -30,6 +30,7 @@ pipeline =
       return sorted
 
     canDispatch = false
+    hasStarted = false
 
     dispatcher =
       actionCallbacks: {}
@@ -209,11 +210,15 @@ pipeline =
           if _.isFunction(cb) then dispatcher.unregisterStoreCallback storeKey, cb
 
     start: (appInit) ->
-      _.each _initializers.stores, (init) -> init()
-      _.each _initializers.adapters, (init) -> init()
+      unless hasStarted
+        _.each _initializers.stores, (init) -> init()
+        delete _initializers.stores
+        _.each _initializers.adapters, (init) -> init()
+        delete _initializers.adapters
 
-      dispatcher.runStoreCallbacks()
+        dispatcher.runStoreCallbacks()
 
-      canDispatch = true
+        canDispatch = true
+        hasStarted = true
 
-      if _.isFunction(appInit) then appInit.call(this)
+        if _.isFunction(appInit) then appInit.call(this)
