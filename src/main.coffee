@@ -1,5 +1,5 @@
 pipeline =
-  createApp: ->
+  createApp: (options) ->
     _initializers =
       stores: []
       adapters: []
@@ -209,7 +209,7 @@ pipeline =
           cb = @["on#{StoreKey}Change"]
           if _.isFunction(cb) then dispatcher.unregisterStoreCallback storeKey, cb
 
-    start: (appInit) ->
+    start: ->
       unless hasStarted
         _.each _initializers.stores, (init) -> init()
         delete _initializers.stores
@@ -221,4 +221,4 @@ pipeline =
         canDispatch = true
         hasStarted = true
 
-        if _.isFunction(appInit) then appInit.call(this)
+        if options? and _.isFunction(options.init) then options.init.call(this)
