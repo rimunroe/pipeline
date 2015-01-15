@@ -1,6 +1,6 @@
 {
   "name": "pipeline-flux",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "a flux library with some differences",
   "main": "pipeline.js",
   "scripts": {

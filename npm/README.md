@@ -1,204 +1,64 @@
-pipeline
-========
-Put in data -> application alters its state -> read from state.
+# Pipeline
+A tiny Flux framework with strong opinions.
+## About
+Pipeline is a framework for creating applications based on the
+[Flux](http://facebook.github.io/flux/) architectural pattern.
 
+Pipeline isn't designed to to solve everyone's problems; its purpose is to see how far the conceptual straightforwardness and declarative nature of Flux can be taken. This means it is straightforward when writing an app, but also straightforward when you, your team, or new people find your code much later and need to figure out what it is doing. Particular parts of Pipeline may feel verbose at first, but the verbosity helps later down the road.
 
+## Parts of a Pipeline app
 
-Design Intent
-=============
+Pipeline apps are composed of three conceptual components: *actions*, *stores*,
+and *adapters*.
 
-Pipeline is a framework for creating flux applications. Flux is a pretty general pattern, and Pipeline is a pretty opinionated version of it.
+### Actions
 
-It's not built to solve everyone's problems, it's built to see how far the conceptual straightforwardness and declarative nature of flux can be taken. This means straightforward when writing the app, but also straightforward when you, your team, and new people find your code 3 months later and have to figure out what the hell it's doing. Particular parts of pipeline may feel verbose at first, but we assure you, 3-months-from-now-you will be very happy about that mild verbosity.
+Actions are the means by which data enters your system.
 
-Pipeline apps are built with three types of objects:  `actions`, `stores`, and `adapters`.
+Actions take arguments and carry a payload of data, which stores can inspect and respond to.
 
-(note: if referring to React Components as 'just DOM adaptors' is funny to you, you have groked pipeline.)
+An app can only respond to one action at a time. Trying to send a new action while another is still being dispatched will result in the new action being deferred until the current dispatch is ended.
 
-The pipeline app should maintain the canonical representation of state for the entire application. This includes application data, UI state, routing/location state, everything.
+**Important note:** Everything within an action's packager should be synchronous.
 
+### Stores
 
-#### Pipeline Objects
+Stores maintain your application state in one place.
 
-##### Actions
+Information has exactly *one* way into a store after the app has started: actions. The only thing that can alter the state of a store is that store itself. After the app has started, the only time the contents of a store can change is during its reaction to an action.
 
-Actions are functions that pass data into the system. They have some special properties.
+The only public interface with a store is through a `get()` method and any custom getters defined under the `api` option.
 
-* They can be called from any context.
-* They cannot be called while another action is being processed.
+Stores can get from other stores within an action callback. This is allowed by specifying that the store must wait for those stores to react to the action. Store evaluation order per-action is sorted ahead of time. If a store does not listen for an action, it should be available to any stores that respond to that action.
 
-##### Stores
+**Important note:** All store state mutation must occur synchronously during the response to an action.
 
-Stores are objects that hold the state in one logical area of the application.
 
-Properties of Stores:
+### Adapters
 
-* Information has exactly 1 way in: they subscribe to actions and process the actions data.
-* Information has exactly 1 way out: they expose an API of getter functions that adapters and views can subscribe to.
-* Stores broadcast a change event which allows subscribed adaptors to process the new state of the application.
-* All store state processing is done synchronously
+Adapters are how a Pipeline app talks to the outside world.
 
-The secret sauce of stores is that they can declare that for an action, they must resolve after some other store. This ensures that if a store calls a getter of another store during its action resulution, then the result is guaranteed to be the new state of that store.
+Adapters react to changes in stores they listen to. They may also react to changes that happen external to Pipeline, such as user actions or external API calls.
 
-Store change events are triggered only after all stores have resolved, so subscribed adapters and views are guaranteed to get the new state of the applicaion via getters.
+A view which renders data in response to a store is one type of adapter. Pipeline comes with a mixin for [React](http://facebook.github.io/react/).
 
-##### Adapters
 
-Adapters are how the pipeline app interacts with world outside of pipeline.
+## How these things are used
 
-* Adapters may subscribe to store change events and then have some effect outside of pipeline
-* Adapters may subscribe to external events and then fire actions into the pipeline app
+(TodoMVC example coming soon)
 
+### Actions
 
-Using Pipeline
-==============
+An action is created by specifying a *name* and, optionally, a *packager*. The packager is a function which can be used to manipulate whatever data is supplied to the action,  so that the action is responsible for determining its own payload instead of the thing invoking it.
 
-Pipeline provides the constructors `createAction()`, `createStore()`, `createAdapter()`, and for conveneince, `createActions()` because it's common to declare many actions and they're small. They all do what you'd expect them to do.
+### Stores
 
-#### Create your App
+A store is created by specifying a *name* and a set of options. The options include the set of actions a store listens for and the callbacks to run when the corresponding actions are dispatched.
 
-```coffee
-App = pipeline.createApp()
-```
+### Adapters
 
-#### Create a Store
+Adapters are created by specifying a name and a set of options. The options include the set of stores an adapter listens to and the callbacks to run when the corresponding stores update themselves.
 
-```coffee
-App.createStore 'myStore',
-  after: ['otherStore']
-  someInternalProperty: true
-  someInteralMethod: ->
-    ...
-  api:
-    aPublicGetter: ->
-      ...
-    anotherPublicGetter: (args...) ->
-      ...
-  actions:
-    someAction: ->
-      @someMethod(@action.something)
-```
+## Installation
 
-##### A Basic Store
-
-```coffee
-App.createStore 'myStore',
-  api:
-    aPublicGetter: ->
-      ...
-  actions:
-    someAction: ->
-      ...
-```
-
-* `API` defines an object where the keys are the names of the getter functions that the store will expose
-* 'actions' defines the actions that the stores will respond to and the callback to run for that action
-
-##### Fancier Stuff
-
-```coffee
-App.createStore 'anotherStore',
-  after: ['myStore']
-  someInternalProperty: true
-  someInteralMethod: ->
-    ...
-  api:
-    aPublicGetter: ->
-      ...
-    anotherPublicGetter: (args...) ->
-      ...
-  actions:
-    someAction: ->
-      if @someInternalProperty
-        @someInternalMethod(@action.something)
-    someOtherAction: ['aThirdStore', ->
-      ...
-    ]
-```
-
-* `after` defines an array of stores that must resolve before this stores does
-* Individual actions can specify their own specific store dependencies
-* any properties not on `api` are internal (except for `get`)
-* action handler functions will have @action and @stores set in their context.
-** @action is the payload of the action passed in
-** @stores is an object of the stores that were declared as dependencies
-* All methods are bound to a private context
-
-#### Actions
-
-`createAction(name, packagerFunction)`
-
-The packager function converts the arguments passed into the action into an payload object that will be passed into the stores.
-
-```coffee
-App.createAction 'someAction', (foo, bar) -> foo:foo, bar:bar
-```
-
-The packager can do simple syntatic validation on the arguments, but any semantic or domain logic should live with the subscribed stores. If an action packager doesn't return an object, then the action will not be passed to the stores.
-
-```coffee
-App.createAction 'someAction', (foo, bar) ->
-  if foo? and bar? then {foo:foo, bar:bar} else console.log("nah bro")
-```
-
-Because actions are small and often declared in groups, `createActions(object)` is provided.
-
-```coffee
-App.createActions
-  foo: (foo) -> foo:foo
-  bar: (bar) -> bar:bar
-  nameSpace:
-    baz: (baz) -> baz:baz
-```
-These actions would then be available
-
-```coffee
-App.actions.foo()
-App.actions.bar()
-App.actions.nameSpace.baz()
-```
-
-Packager functions may seem slighly redundant (it's basically just the word foo four times in a row) but they provide some subtle benefits.
-
-* a place to do optional syntax checking.
-* self documenting about the syntax of what object action handlers will be receiving.
-* naming of arguments prevents order of args problems (everyone loves setTimeout).
-
-
-#### Adapters
-
-(These are the biggest difference between pipeline and standard flux)
-
-Adapters are objects that (1) listen to store change events -> (2) reason about the state of the stores -> (3) interact with the outside world if necessary.
-
-Adapters can be bi-directional, they can also (4) listen to events events outside of your pipeline app -> (5) reason about that event -> (6) send actions into your application if necessary.
-
-examples:
-
-a `historyAdapter` listens to the canonical state for your application in some sort of `locationStore` and pushes to the history when appropriate. This adaptor would also listen to popstate events and fire navigation actions when the user changes the url.
-
-a 'networkAdapter' listens to the state of a store and makes network calls accordingly.
-
-
-
-
-## Hello World
-
-#### Create a pipeline app
-```coffee
-HW = pipeline.createApp()
-```
-
-#### Create a store
-```coffee
-
-```
-
-
-## Component Reference
-
-Things in Pipeline:
-* [App](https://github.com/rimunroe/pipeline/wiki/App)
-* [Actions](https://github.com/rimunroe/pipeline/wiki/Actions)
-* [Stores](https://github.com/rimunroe/pipeline/wiki/Stores)
-* [Adapters](https://github.com/rimunroe/pipeline/wiki/Adapters)
+`bower install pipeline` or `npm install pipeline-flux`

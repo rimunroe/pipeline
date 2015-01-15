@@ -14,8 +14,12 @@
   pipeline = {};
 
   pipeline = {
-    createApp: function() {
-      var dispatcher, isDispatching, _keyObj, _sortDependencies;
+    createApp: function(options) {
+      var canDispatch, dispatcher, hasStarted, _initializers, _keyObj, _sortDependencies;
+      _initializers = {
+        stores: [],
+        adapters: []
+      };
       _keyObj = function(array, callback) {
         var key, obj, _i, _len;
         obj = {};
@@ -55,7 +59,8 @@
         }
         return sorted;
       };
-      isDispatching = false;
+      canDispatch = false;
+      hasStarted = false;
       dispatcher = {
         actionCallbacks: {},
         storeCallbacks: {},
@@ -110,7 +115,7 @@
           _send = (function(_this) {
             return function() {
               var cb, storeKey, val, _i, _j, _len, _len1, _ref, _ref1, _ref2;
-              isDispatching = true;
+              canDispatch = true;
               _this.changedStores = {};
               if (_this.actionCallbacks[actionKey] != null) {
                 _ref = _this.actionCallbacks[actionKey];
@@ -130,14 +135,35 @@
                   }
                 }
               }
-              return isDispatching = false;
+              return canDispatch = false;
             };
           })(this);
-          if (isDispatching) {
-            return _.defer(_send);
-          } else {
+          if (canDispatch) {
             return _send();
+          } else {
+            return _.defer(_send);
           }
+        },
+        runStoreCallbacks: function() {
+          var cb, storeKey, val, _ref, _results;
+          _ref = this.changedStores;
+          _results = [];
+          for (storeKey in _ref) {
+            val = _ref[storeKey];
+            if (this.storeCallbacks[storeKey] != null) {
+              _results.push((function() {
+                var _i, _len, _ref1, _results1;
+                _ref1 = this.storeCallbacks[storeKey];
+                _results1 = [];
+                for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+                  cb = _ref1[_i];
+                  _results1.push(cb.callback());
+                }
+                return _results1;
+              }).call(this));
+            }
+          }
+          return _results;
         }
       };
       return {
@@ -161,45 +187,50 @@
           })(this);
         },
         createStore: function(key, options) {
-          var after, callbacks, data, reservedKeys, store, stores, _context;
+          var after, callbacks, data, reservedKeys, store, stores, _context, _initContext, _mutate, _trigger;
           callbacks = [];
           data = {};
+          _mutate = function(updates, value) {
+            var val, _results;
+            if (typeof updates === 'object') {
+              _results = [];
+              for (key in updates) {
+                val = updates[key];
+                _results.push(data[key] = val);
+              }
+              return _results;
+            } else if (typeof updates === 'string') {
+              return data[updates] = value;
+            }
+          };
           after = typeof options.after === 'string' ? [options.after] : Array.isArray(options.after) ? options.after : [];
           if (__indexOf.call(after, key) >= 0) {
             throw new Error("store \"" + key + "\" waits for itself");
           }
-          reservedKeys = _.intersection(_.keys(options), ['stores', 'key', 'trigger', 'get', 'update']);
+          reservedKeys = _.intersection(_.keys(options), ['stores', 'key', 'get', 'update']);
           if (!_.isEmpty(reservedKeys)) {
             _.each(reservedKeys, function(reservedKey) {
               throw new Error("In \"" + key + "\" Store: \"" + reservedKey + "\" is a reserved key and cannot be used.");
             });
           }
-          _context = _.omit(options, ['api', 'actions']);
+          _context = _.omit(options, ['initialize', 'api', 'actions']);
           _.each(_context, function(prop, key) {
             if (_.isFunction(prop)) {
               return _context[key] = prop.bind(_context);
             }
           });
+          _trigger = function() {
+            return dispatcher.storeHasChanged(key);
+          };
           _.extend(_context, {
             key: key,
             api: {},
-            trigger: function() {
-              return dispatcher.storeHasChanged(this.key);
-            },
             get: function(key) {
               return _.clone(key != null ? data[key] : data);
             },
             update: function(updates, value) {
-              var val;
-              if (typeof updates === 'object') {
-                for (key in updates) {
-                  val = updates[key];
-                  data[key] = val;
-                }
-              } else if (typeof updates === 'string') {
-                data[updates] = value;
-              }
-              return this.trigger();
+              _mutate(updates, value);
+              return _trigger();
             }
           });
           stores = this.stores;
@@ -236,31 +267,36 @@
             };
             return dispatcher.onAction(key, actionKey, waitFor, fn);
           });
+          if (_.isFunction(options.initialize)) {
+            _initContext = _.omit(_context, ['actions', 'update']);
+            _initContext.update = _mutate;
+            _initializers.stores.push(options.initialize.bind(_initContext));
+          }
           this.stores[key] = store;
           return store;
         },
         createAdapter: function(key, options) {
-          var callback, name, property, storeKey, _context, _ref, _results;
+          var callback, name, property, storeKey, _context, _ref, _ref1;
           _context = {
             key: key,
             stores: this.stores,
             actions: this.actions
           };
-          for (name in options) {
-            property = options[name];
-            if (name !== 'stores') {
-              if (typeof property === 'function') {
-                _context[name] = property.bind(_context);
-              }
+          _ref = _.omit(options, ['stores', 'initialize']);
+          for (name in _ref) {
+            property = _ref[name];
+            if (_.isFunction(property)) {
+              _context[name] = property.bind(_context);
             }
           }
-          _ref = options.stores;
-          _results = [];
-          for (storeKey in _ref) {
-            callback = _ref[storeKey];
-            _results.push(dispatcher.registerStoreCallback(storeKey, key, callback.bind(_context)));
+          _ref1 = options.stores;
+          for (storeKey in _ref1) {
+            callback = _ref1[storeKey];
+            dispatcher.registerStoreCallback(storeKey, key, callback.bind(_context));
           }
-          return _results;
+          if (_.isFunction(options.initialize)) {
+            return _initializers.adapters.push(options.initialize.bind(_.omit(_context, 'actions')));
+          }
         },
         reactMixin: function(stores) {
           var storeKey, storesObj, _i, _len;
@@ -307,14 +343,27 @@
             }
           };
         },
-        start: function(appInit) {
-          console.log('starting, initializers: ', this.initializers);
-          _.each(this.initializers, function(init) {
-            return init();
-          });
-          delete this.initializers;
-          if (_.isFunction(appInit)) {
-            return appInit.call(this);
+        start: function() {
+          var _context;
+          if (!hasStarted) {
+            _.each(_initializers.stores, function(init) {
+              return init();
+            });
+            delete _initializers.stores;
+            _.each(_initializers.adapters, function(init) {
+              return init();
+            });
+            delete _initializers.adapters;
+            dispatcher.runStoreCallbacks();
+            canDispatch = true;
+            hasStarted = true;
+            if ((options != null) && _.isFunction(options.initialize)) {
+              _context = {
+                stores: this.stores,
+                actions: this.actions
+              };
+              return options.initialize.call(_context);
+            }
           }
         }
       };
