@@ -218,9 +218,9 @@ pipeline =
         canDispatch = true
         hasStarted = true
 
-        if options? and _.isFunction(options.init)
+        if options? and _.isFunction(options.initialize)
           _context =
             stores: @stores
             actions: @actions
 
-          options.init.call(_context)
+          options.initialize.call(_context)
