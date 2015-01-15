@@ -179,6 +179,8 @@ a `historyAdapter` listens to the canonical state for your application in some s
 
 a 'networkAdapter' listens to the state of a store and makes network calls accordingly.
 
+## [API](docs/api.md)
+
 ## Component Reference
 
 Things in Pipeline:
