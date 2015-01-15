@@ -179,22 +179,6 @@ a `historyAdapter` listens to the canonical state for your application in some s
 
 a 'networkAdapter' listens to the state of a store and makes network calls accordingly.
 
-
-
-
-## Hello World
-
-#### Create a pipeline app
-```coffee
-HW = pipeline.createApp()
-```
-
-#### Create a store
-```coffee
-
-```
-
-
 ## Component Reference
 
 Things in Pipeline:
