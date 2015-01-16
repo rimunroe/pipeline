@@ -7,7 +7,7 @@ var pipeline = {
 
     var _keyObj = function(array, callback){
       var obj = {};
-      for(key in array) obj[key] = callback(key);
+      for(var key in array) obj[key] = callback(key);
       return obj;
     };
 
@@ -20,13 +20,13 @@ var pipeline = {
       while(!_.isEmpty(working)){
         var cyclic = true;
 
-        for(action in working){
+        working.forEach(function(action){
           if(_.every(action.after, function(dep){return sortedOrder.indexOf(dep) >= 0;})){
             cyclic = false;
             sorted.push(action);
             sortedOrder.push(action.storeKey);
           }
-        }
+        });
 
         if(cyclic) return false;
 
@@ -47,9 +47,11 @@ var pipeline = {
       onAction: function(storeKey, actionKey, after, callback){
         var that = this;
         if(this.actionCallbacks[actionKey] == null) this.actionCallbacks[actionKey] = [];
-        if(!_.every(after, function(dep){return _.find(that.actionCallbacks[actionKey], function(action){return dep === action.storeKey;});})){
-          missingDependency = true;
-        }
+        var missingDependency = !_.every(after, function(dep) {
+          return _.find(that.actionCallbacks[actionKey], function(action) {
+            return dep === action.storeKey;
+          });
+        });
 
         this.actionCallbacks[actionKey].push({
           storeKey: storeKey,
@@ -92,16 +94,19 @@ var pipeline = {
           that.changedStores = {};
 
           if(that.actionCallbacks[actionKey] != null){
-            for (var cb in that.actionCallbacks[actionKey]) cb.callback(payload);
+            _.forEach(that.actionCallbacks[actionKey], function(cb){cb.callback(payload);});
           }
           for (var storeKey in that.changedStores) {
             if (that.storeCallbacks[storeKey] != null) {
-              for (var callback in that.storeCallbacks[storeKey]) cb.callback;
+              _.forEach(that.storeCallbacks[storeKey], function(cb){cb.callback();});
             }
           }
 
           canDispatch = false;
         };
+
+        if (canDispatch) _send()
+        else _.defer(_send)
       },
 
       runStoreCallbacks: function(){
