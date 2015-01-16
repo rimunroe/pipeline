@@ -1,6 +1,5 @@
 fs = require 'fs'
 gulp = require 'gulp'
-coffee = require 'gulp-coffee'
 concat = require 'gulp-concat'
 rename = require 'gulp-rename'
 uglify = require 'gulp-uglify'
@@ -10,21 +9,20 @@ version = -> require('./package.json').version
 
 gulp.task 'build', ->
   files = [
-    './src/setup.coffee'
-    './src/main.coffee'
-    './src/export.coffee'
+    './src/setup.js'
+    './src/main.js'
+    './src/export.js'
   ]
 
   gulp.src(files)
     .pipe concat 'pipeline.js'
-    .pipe coffee()
     .pipe gulp.dest './dist'
     .pipe uglify()
     .pipe rename 'pipeline.min.js'
     .pipe gulp.dest './dist'
 
 gulp.task 'watch', ->
-  gulp.watch './src/**/*.coffee', ['build']
+  gulp.watch './src/**/*.js', ['build']
 
 gulp.task 'set-npm-version', ->
   npmJson = JSON.parse fs.readFileSync './npm/package.json'
