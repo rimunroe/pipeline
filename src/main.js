@@ -256,32 +256,33 @@ var pipeline = {
         }
       },
 
-      reactMixin: function(stores){
+      reactMixin: function(stores) {
         if (_.isString(stores)) stores = [stores];
-        var storesObj = {};
-        for (var storeKey in stores) storesObj[storeKey] = this.stores[storeKey];
 
+        storesObj = {};
+
+        for (var i = 0; i < stores.length; i++) {
+          var storeKey = stores[i];
+          storesObj[storeKey] = this.stores[storeKey];
+        }
         return {
           stores: storesObj,
           actions: this.actions,
 
-          componentDidMount: function(){
-            for (var storeKey in stores) {
-              var StoreKey = storeKey.charAt(0).toUpperCase() + storeKey.slice(1);
-              var cb = this['on' + StoreKey + 'Change'];
-              if (_.isFunction(cb)) {
-                dispatcher.registerStoreCallback(storeKey, 'react-view', cb);
-              }
+          componentDidMount: function() {
+            for (var i = 0; i < stores.length; i++) {
+              var storeKey = stores[i];
+              StoreKey = storeKey.charAt(0).toUpperCase() + storeKey.slice(1);
+              cb = this["on" + StoreKey + "Change"];
+              if (_.isFunction(cb)) dispatcher.registerStoreCallback(storeKey, 'react-view', cb);
             }
           },
-
-          componentWillUnmount: function(){
-            for (var storeKey in stores) {
-              var StoreKey = storeKey.charAt(0).toUpperCase() + storeKey.slice(1);
-              var cb = this['on' + StoreKey + 'Change'];
-              if (_.isFunction(cb)) {
-                dispatcher.unregisterStoreCallback(storeKey, cb);
-              }
+          componentWillUnmount: function() {
+            for (var i = 0; i < stores.length; i++) {
+              var storeKey = stores[i];
+              StoreKey = storeKey.charAt(0).toUpperCase() + storeKey.slice(1);
+              cb = this["on" + StoreKey + "Change"];
+              if (_.isFunction(cb)) dispatcher.unregisterStoreCallback(storeKey, cb);
             }
           }
         };
