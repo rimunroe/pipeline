@@ -4,7 +4,7 @@
   "description": "A tiny Flux framework with strong opinions",
   "main": "dist/pipeline.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node_modules/mocha/bin/mocha"
   },
   "repository": {
     "type": "git",
@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/rimunroe/pipeline",
   "devDependencies": {
+    "chai": "^1.10.0",
     "gulp": "^3.8.10",
     "gulp-concat": "^2.4.2",
     "gulp-insert": "^0.4.0",
@@ -27,6 +28,7 @@
     "gulp-rename": "^1.2.0",
     "gulp-shell": "^0.2.11",
     "gulp-uglify": "^1.0.2",
+    "mocha": "^2.1.0",
     "node-notifier": "^4.0.3"
   },
   "dependencies": {
