@@ -7,7 +7,10 @@ var pipeline = {
 
     var _keyObj = function(array, callback){
       var obj = {};
-      for(var key in array) obj[key] = callback(key);
+      for(var i = 0; i < array.length; i++){
+        var key = array[i];
+        obj[key] = callback(key);
+      }
       return obj;
     };
 
@@ -219,7 +222,7 @@ var pipeline = {
           }
 
           var fn = function(payload){
-            _context.stores = _keyObj(waitFor, function(key){return stores[key]});
+            _context.stores = _keyObj(waitFor, function(key){return stores[key];});
             callback.call(_context, payload);
           };
 
