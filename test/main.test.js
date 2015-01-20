@@ -1,6 +1,5 @@
-var chai = require('chai')
-var should = chai.should()
-// var pipeline = require('../src/main.js');
+var chai = require('chai');
+var should = chai.should();
 
 describe('Pipeline', function(){
   var pipeline;
@@ -24,7 +23,7 @@ describe('Pipeline', function(){
       var App2 = pipeline.createApp();
 
       App1.should.not.equal(App2);
-    })
+    });
   });
 
   describe('A simple pipeline app', function(){
