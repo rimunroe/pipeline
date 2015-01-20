@@ -94,4 +94,60 @@ describe('Pipeline', function(){
       });
     });
   });
+
+  describe('An app with two stores where one waits for the other', function(){
+    var App, output;
+
+    beforeEach(function(){
+      output = undefined;
+      App = pipeline.createApp();
+      App.createAction('newNumber', function(number){
+        return {data: number};
+      });
+      App.createStore('leader', {
+        initialize: function(){
+          this.update({number: 0});
+        },
+        actions: {
+          newNumber: function(payload){
+            this.update({number: payload.data});
+          }
+        }
+      });
+      App.createStore('follower', {
+        after: ['leader'],
+        initialize: function(){
+          this.update({number: 0});
+        },
+        actions: {
+          newNumber: function(payload){
+            this.update({number: this.stores.leader.get('number') * 2});
+          }
+        }
+      });
+      App.createAdapter('someAdapter', {
+        initialize: function(){
+          output = this.stores.follower.get('number');
+        },
+        stores: {
+          follower: function(){
+            output = this.stores.follower.get('number');
+          }
+        }
+      });
+
+      App.start();
+    });
+
+    afterEach(function(){
+      output = undefined;
+    });
+
+    describe('two stores with an evaluation order', function(){
+      it('should evaluate in the correct order', function(){
+        App.actions.newNumber(5);
+        output.should.equal(10);
+      });
+    });
+  });
 });
