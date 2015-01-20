@@ -26,6 +26,30 @@ describe('Pipeline', function(){
     });
   });
 
+  describe('Creating stores', function(){
+    it('should throw an error if you create a circular dependency', function(){
+      var App = pipeline.createApp();
+
+      App.createStore('foo', {
+        after: 'bar',
+        actions:{
+          boop: function(){}
+        }
+      });
+
+      var creatingBadStore = function(){
+        App.createStore('bar', {
+          after: 'foo',
+          actions: {
+            boop: function(){}
+          }
+        });
+      };
+
+      creatingBadStore.should.throw(Error);
+    });
+  });
+
   describe('A simple pipeline app', function(){
     var App, output;
 
