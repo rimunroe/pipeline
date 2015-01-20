@@ -29,7 +29,8 @@
     "gulp-shell": "^0.2.11",
     "gulp-uglify": "^1.0.2",
     "mocha": "^2.1.0",
-    "node-notifier": "^4.0.3"
+    "node-notifier": "^4.0.3",
+    "sinon": "^1.12.2"
   },
   "dependencies": {
     "lodash": "^2.4.1"
