@@ -1,11 +1,27 @@
 var fs = require('fs');
+var path = require('path');
 var gulp = require('gulp');
 var concat = require('gulp-concat');
 var rename = require('gulp-rename');
 var uglify = require('gulp-uglify');
 var shell = require('gulp-shell');
+var plumber = require('gulp-plumber');
+var notifier = require('node-notifier');
 
 var version = function(){return require('./package.json').version;};
+
+var handleError = function(error){
+  var filePath = error.fileName.split(path.sep);
+  var file = filePath[filePath.length - 1];
+  var line = error.lineNumber;
+  var message = '\uD83D\uDCA5  [' + file + ':' + line + ']' + error.message.split(':')[1];
+
+  notifier.notify({message: message});
+  console.log('\n' + message + '\n');
+  console.log(error.message);
+  console.log(error.stack);
+  console.log('\n');
+};
 
 gulp.task('build', function(){
   var files = [
@@ -15,6 +31,7 @@ gulp.task('build', function(){
   ];
 
   gulp.src(files)
+    .pipe(plumber({errorHandler: handleError}))
     .pipe(concat('pipeline.js'))
     .pipe(gulp.dest('./dist'))
     .pipe(uglify())
