@@ -14,7 +14,7 @@ var handleError = function(error){
   var filePath = error.fileName.split(path.sep);
   var file = filePath[filePath.length - 1];
   var line = error.lineNumber;
-  var message = '\uD83D\uDCA5  [' + file + ':' + line + ']' + error.message.split(':')[1];
+  var message = '\uD83D\uDCA5  [' + file + ':' + line + ']' + error.message.slice(error.fileName.length + 1, error.message.length);
 
   notifier.notify({message: message});
   console.log('\n' + message + '\n');
