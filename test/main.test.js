@@ -3,15 +3,38 @@ var pipeline = require('../dist/pipeline.js');
 var should = chai.should();
 
 describe('While defining an app', function(){
+  var App;
+
+  beforeEach(function(){
+    App = pipeline.createApp()
+  });
 
   describe('creating a single store', function(){
 
     it('throws an error when creating a store which depends on itself', function(){
-      // TODO
+
+      var createSelfReferencingStore = function(){
+        App.createStore('foo',{
+          after: 'foo'
+        })
+      };
+
+      createSelfReferencingStore.should.throw(Error);
+
     });
 
     it('throws an error when using reserved keys in the api object', function(){
-      // TODO
+
+      var createStoreWithBadAPIKeys = function(){
+        App.createStore('foo',{
+          api: {
+            stores: undefined
+          }
+        })
+      };
+
+      createStoreWithBadAPIKeys.should.throw(Error);
+
     });
 
   });
