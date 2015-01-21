@@ -166,7 +166,7 @@ var pipeline = {
         var _mutate = function(updates, value){
           if (typeof updates === 'object') {
             for (var key in updates) data[key] = updates[key];
-          } else if (typeof update === 'string') data[updates] = value;
+          } else if (typeof updates === 'string') data[updates] = value;
         };
 
         var after;
