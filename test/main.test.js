@@ -224,7 +224,7 @@ describe('While an app is running', function(){
 
   });
 
-  describe('the reactions of stores to actions', function(){
+  describe('sending an action', function(){
     var output, order, position;
 
     beforeEach(function(){
@@ -273,7 +273,7 @@ describe('While an app is running', function(){
       App.actions.newNumber(2);
     });
 
-    it('happen in proper order', function(){
+    it('triggers reactions in the proper order', function(){
       expectedOrder = ['storeB', 'storeA', 'anAdapter'];
       for(var i = 0; i < order.length; i++){
         order[i].should.equal(expectedOrder[i]);
@@ -282,18 +282,87 @@ describe('While an app is running', function(){
 
   });
 
-  describe('adapter reactions', function(){
+  describe('creating and running another app at the same time', function(){
+    var App2, output1, output2;
 
-    it('occur in response to stores changing', function(){
-      // TODO
+    beforeEach(function(){
+      output1 = 0;
+      output2 = 0;
+
+      App2 = pipeline.createApp();
+
+      App.createStore('storeA', {
+        actions: {
+          newNumber: {
+            after: 'storeB',
+            action: function(){
+              this.update('number', this.stores.storeB.get('number') * 2);
+            }
+          }
+        }
+      });
+
+      App.createStore('storeB', {
+        actions: {
+          newNumber: function(payload){
+            this.update({number: payload.data});
+          }
+        }
+      });
+
+      App.createAdapter('anAdapter', {
+        stores: {
+          storeA: function(){
+            output1 = this.stores.storeA.get('number');
+          }
+        }
+      });
+
+      App.createAction('newNumber', function(value){
+        return {data: value};
+      });
+
+      App.start();
+
+      App2.createAction('newNumber', function(value){
+        return {data: value};
+      });
+
+      App2.createAdapter('anAdapter', {
+        stores: {
+          storeA: function(){
+            output2 = this.stores.storeA.get('number');
+          }
+        }
+      });
+
+      App2.createStore('storeB', {
+        actions: {
+          newNumber: function(payload){
+            this.update({number: payload.data});
+          }
+        }
+      });
+
+      App2.createStore('storeA', {
+        actions: {
+          newNumber: {
+            after: 'storeB',
+            action: function(){
+              this.update('number', this.stores.storeB.get('number') * 2);
+            }
+          }
+        }
+      });
+
+      App2.start();
     });
 
-  });
-
-  describe('creating and running another app at the same time', function(){
-
     it('does not interfere with the app', function(){
-      // TODO
+      App.actions.newNumber(3);
+      App2.actions.newNumber(6);
+      output1.should.equal(6);
+      output2.should.equal(12);
     });
 
   });
