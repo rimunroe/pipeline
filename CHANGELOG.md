@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.0.5 - 2015-01-21
+
+- Removed CoffeeScript from project.
+- `gulp watch` will no longer crash constantly on syntax errors
+- Better notifier messages for build errors
+- Added some test coverage (`npm test` to run)
+- New actions will now be sent synchronously instead of asynchronously if dispatch is already in progress
+- Stores and actions can no longer be created after the app has started
+- Fixed store `update` method so that updating a single value works properly
+
 ## 0.0.4 - 2015-01-15
 
 - Added changelog

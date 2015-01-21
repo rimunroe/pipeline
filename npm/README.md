@@ -45,8 +45,6 @@ A view which renders data in response to a store is one type of adapter. Pipelin
 
 ## How these things are used
 
-(TodoMVC example coming soon)
-
 ### Actions
 
 An action is created by specifying a *name* and, optionally, a *packager*. The packager is a function which can be used to manipulate whatever data is supplied to the action,  so that the action is responsible for determining its own payload instead of the thing invoking it.
