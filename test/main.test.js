@@ -42,11 +42,54 @@ describe('While defining an app', function(){
   describe('creating multiple stores', function(){
 
     it('throws an error when creating two mutually dependent stores', function(){
-      // TODO
+
+      var createCircularReference = function(){
+        App.createStore('foo',{
+          after: 'bar',
+          actions: {
+            boop: function(){}
+          }
+        });
+
+        App.createStore('bar',{
+          after: 'foo',
+          actions: {
+            boop: function(){}
+          }
+        });
+      };
+
+      createCircularReference.should.throw(Error);
+
     });
 
     it('throws an error when creating three stores with a circular dependency', function(){
-      // TODO
+
+      var createCircularReference = function(){
+        App.createStore('foo',{
+          after: 'bar',
+          actions: {
+            boop: function(){}
+          }
+        });
+
+        App.createStore('bar',{
+          after: 'baz',
+          actions: {
+            boop: function(){}
+          }
+        });
+
+        App.createStore('baz',{
+          after: 'foo',
+          actions: {
+            boop: function(){}
+          }
+        });
+      };
+
+      createCircularReference.should.throw(Error);
+
     });
 
     describe('the ways to define dependencies', function(){
