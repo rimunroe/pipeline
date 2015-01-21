@@ -163,13 +163,26 @@ describe('While starting an app', function(){
 });
 
 describe('While an app is running', function(){
+  var App;
+
+  beforeEach(function(){
+    App = pipeline.createApp();
+  });
 
   it('is not possible to create new actions', function(){
-    // TODO
+    App.start()
+    createAction = function(){
+      App.createAction('foo', function(){});
+    }
+    createAction.should.throw(Error);
   });
 
   it('is not possible to create new stores', function(){
-    // TODO
+    App.start()
+    createStore = function(){
+      App.createStore('foo', function(){});
+    }
+    createStore.should.throw(Error);
   });
 
   describe('sending multiple actions in quick succession', function(){
