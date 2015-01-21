@@ -103,11 +103,41 @@ describe('While defining an app', function(){
 describe('While starting an app', function(){
 
   describe('the initialization functions', function(){
+    var App, order, position;
+
+    beforeEach(function(){
+      position = 0
+      order = new Array(3);
+
+      App = pipeline.createApp({
+        initialize: function(){
+          order[position] = 'app';
+          position += 1;
+        }
+      });
+
+      App.createStore('foo', {
+        initialize: function(){
+          order[position] = 'store';
+          position += 1;
+        }
+      });
+
+      App.createAdapter('boop', {
+        initialize: function(){
+          order[position] = 'adapter';
+          position += 1;
+        }
+      });
+
+      App.start();
+
+    });
 
     describe('of stores', function(){
 
       it('are called first', function(){
-        // TODO
+        order[0].should.equal('store');
       });
 
     });
@@ -115,7 +145,7 @@ describe('While starting an app', function(){
     describe('of adapters', function(){
 
       it('are called second', function(){
-        // TODO
+        order[1].should.equal('adapter');
       });
 
     });
@@ -123,7 +153,7 @@ describe('While starting an app', function(){
     describe('of the app', function(){
 
       it('is called third', function(){
-        // TODO
+        order[2].should.equal('app');
       });
 
     });
