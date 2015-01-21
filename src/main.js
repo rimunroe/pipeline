@@ -41,6 +41,7 @@ var pipeline = {
 
     var canDispatch = false;
     var hasStarted = false;
+    var actionQueue = [];
 
     var dispatcher = {
       actionCallbacks: {},
@@ -89,27 +90,43 @@ var pipeline = {
         this.changedStores[storeKey] = true;
       },
 
-      sendAction: function(actionKey, payload){
+      dispatchAction: function(actionKey, payload){
+        if (this.actionCallbacks[actionKey] != null) {
+          _.forEach(this.actionCallbacks[actionKey], function(cb){
+            cb.callback(payload);
+          });
+        }
+        for (var storeKey in this.changedStores) {
+          if (this.storeCallbacks[storeKey] != null) {
+            _.forEach(this.storeCallbacks[storeKey], function(cb){
+              cb.callback();
+            });
+          }
+        }
+      },
+
+      dispatchActions: function(){
+        canDispatch = false;
+
         var that = this;
 
-        var _send = function(){
-          canDispatch = true;
-          that.changedStores = {};
+        for (var offset = 0; offset < actionQueue.length; offset++) {
+          var actionKey = actionQueue[offset].actionKey;
+          var payload = actionQueue[offset].payload;
 
-          if(that.actionCallbacks[actionKey] != null){
-            _.forEach(that.actionCallbacks[actionKey], function(cb){cb.callback(payload);});
-          }
-          for (var storeKey in that.changedStores) {
-            if (that.storeCallbacks[storeKey] != null) {
-              _.forEach(that.storeCallbacks[storeKey], function(cb){cb.callback();});
-            }
-          }
+          this.dispatchAction(actionKey, payload);
+        }
 
-          canDispatch = false;
-        };
+        actionQueue = [];
+        canDispatch = true;
+      },
 
-        if (canDispatch) _send()
-        else _.defer(_send)
+      enqueueAction: function(actionKey, payload){
+        actionQueue.push({
+          actionKey: actionKey,
+          payload: payload
+        });
+        if (canDispatch) this.dispatchActions();
       },
 
       runStoreCallbacks: function(){
@@ -137,7 +154,7 @@ var pipeline = {
         var that = this;
         this.actions[actionKey] = function(){
           var payload = packager.apply(null, arguments);
-          dispatcher.sendAction(actionKey, typeof payload === 'object' ? payload : {});
+          dispatcher.enqueueAction(actionKey, typeof payload === 'object' ? payload : {});
         };
       },
 
