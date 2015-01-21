@@ -85,9 +85,7 @@ gulp.task('prepare-release', [
   'prepare-bower'
 ], function(){
   console.log('Run the following when ready:');
-  console.log('git add npm/package.json bower.json bower/*.js');
-  console.log('git commit -m \'Published version ' + version() + ' of pipeline.\'');
-  console.log('git tag -a v' + version());
+  console.log('git tag -a v' + version() + ' -m \'Published version ' + version() + ' of pipeline.\'');
 });
 
 gulp.task('default', ['build']);
