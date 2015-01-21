@@ -106,7 +106,7 @@ describe('While starting an app', function(){
 
     describe('of stores', function(){
 
-      it('is called first', function(){
+      it('are called first', function(){
         // TODO
       });
 
@@ -114,7 +114,7 @@ describe('While starting an app', function(){
 
     describe('of adapters', function(){
 
-      it('is called second', function(){
+      it('are called second', function(){
         // TODO
       });
 
