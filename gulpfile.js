@@ -4,7 +4,6 @@ var gulp = require('gulp');
 var concat = require('gulp-concat');
 var rename = require('gulp-rename');
 var uglify = require('gulp-uglify');
-var shell = require('gulp-shell');
 var plumber = require('gulp-plumber');
 var notifier = require('node-notifier');
 
@@ -81,18 +80,14 @@ gulp.task('prepare-bower', [
   'copy-bower-javascript'
 ]);
 
-gulp.task('commit-version-changes', [
+gulp.task('prepare-release', [
   'prepare-npm',
   'prepare-bower'
-], shell.task([
-  'git add npm/package.json bower.json bower/*.js',
-  'git commit -m \'Build version ' + version() + ' of pipeline.\''
-]));
-
-gulp.task('release-npm', ['commit-version-changes'], shell.task(['npm publish'], {
-  cwd: './npm'
-}));
-
-gulp.task('publish', ['release-npm']);
+], function(){
+  console.log('Run the following when ready:');
+  console.log('git add npm/package.json bower.json bower/*.js');
+  console.log('git commit -m \'Published version ' + version() + ' of pipeline.\'');
+  console.log('git tag -a v' + version());
+});
 
 gulp.task('default', ['build']);
