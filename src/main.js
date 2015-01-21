@@ -150,6 +150,7 @@ var pipeline = {
       },
 
       createAction: function(actionKey, packager){
+        if (hasStarted) throw new Error("cannot create new action \"" + actionKey + "\". App has already started.");
         var that = this;
         this.actions[actionKey] = function(){
           var payload = packager.apply(null, arguments);
@@ -158,6 +159,7 @@ var pipeline = {
       },
 
       createStore: function(key, options){
+        if (hasStarted) throw new Error("cannot create new store \"" + key + "\". App has already started.");
         var callbacks = [];
         var data = {};
 
