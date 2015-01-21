@@ -225,9 +225,59 @@ describe('While an app is running', function(){
   });
 
   describe('the reactions of stores to actions', function(){
+    var output, order, position;
+
+    beforeEach(function(){
+      output = 0;
+      position = 0;
+      order = new Array(3);
+
+      App.createStore('storeA', {
+        actions: {
+          newNumber: {
+            after: 'storeB',
+            action: function(){
+              order[position] = 'storeA';
+              position += 1;
+              this.update('number', this.stores.storeB.get('number') * 2);
+            }
+          }
+        }
+      });
+
+      App.createStore('storeB', {
+        actions: {
+          newNumber: function(payload){
+            order[position] = 'storeB';
+            position += 1;
+            this.update({number: payload.data});
+          }
+        }
+      });
+
+      App.createAdapter('anAdapter', {
+        stores: {
+          storeA: function(){
+            order[position] = 'anAdapter';
+            position += 1;
+            output = this.stores.storeA.get('number');
+          }
+        }
+      });
+
+      App.createAction('newNumber', function(value){
+        return {data: value};
+      });
+
+      App.start();
+      App.actions.newNumber(2);
+    });
 
     it('happen in proper order', function(){
-      // TODO
+      expectedOrder = ['storeB', 'storeA', 'anAdapter'];
+      for(var i = 0; i < order.length; i++){
+        order[i].should.equal(expectedOrder[i]);
+      }
     });
 
   });
