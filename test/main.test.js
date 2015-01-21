@@ -186,9 +186,40 @@ describe('While an app is running', function(){
   });
 
   describe('sending multiple actions in quick succession', function(){
+    var output;
+
+    beforeEach(function(){
+      output = 0;
+    });
 
     it('resolves synchronously', function(){
-      // TODO
+
+      App.createAction('anAction', function(value){
+        return {data: value};
+      });
+
+      App.createStore('aStore', {
+        actions: {
+          anAction: function(payload){
+            this.update({number: payload.data});
+          }
+        }
+      });
+
+      App.createAdapter('anAdapter', {
+        stores: {
+          aStore: function(){
+            output = this.stores.aStore.get('number');
+          }
+        }
+      });
+
+      App.start();
+
+      App.actions.anAction(2);
+      App.actions.anAction(1);
+      output.should.equal(1);
+
     });
 
   });
