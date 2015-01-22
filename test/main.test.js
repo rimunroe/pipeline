@@ -103,30 +103,26 @@ describe('While defining an app', function(){
 describe('While starting an app', function(){
 
   describe('the initialization functions', function(){
-    var App, order, position;
+    var App, order;
 
     beforeEach(function(){
-      position = 0
-      order = new Array(3);
+      order = [];
 
       App = pipeline.createApp({
         initialize: function(){
-          order[position] = 'app';
-          position += 1;
+          order.push('app');
         }
       });
 
       App.createStore('foo', {
         initialize: function(){
-          order[position] = 'store';
-          position += 1;
+          order.push('store');
         }
       });
 
       App.createAdapter('boop', {
         initialize: function(){
-          order[position] = 'adapter';
-          position += 1;
+          order.push('adapter');
         }
       });
 
@@ -225,20 +221,18 @@ describe('While an app is running', function(){
   });
 
   describe('sending an action', function(){
-    var output, order, position;
+    var output, order;
 
     beforeEach(function(){
       output = 0;
-      position = 0;
-      order = new Array(3);
+      order = [];
 
       App.createStore('storeA', {
         actions: {
           newNumber: {
             after: 'storeB',
             action: function(){
-              order[position] = 'storeA';
-              position += 1;
+              order.push('storeA');
               this.update('number', this.stores.storeB.get('number') * 2);
             }
           }
@@ -248,8 +242,7 @@ describe('While an app is running', function(){
       App.createStore('storeB', {
         actions: {
           newNumber: function(payload){
-            order[position] = 'storeB';
-            position += 1;
+            order.push('storeB');
             this.update({number: payload.data});
           }
         }
@@ -258,8 +251,7 @@ describe('While an app is running', function(){
       App.createAdapter('anAdapter', {
         stores: {
           storeA: function(){
-            order[position] = 'anAdapter';
-            position += 1;
+            order.push('anAdapter');
             output = this.stores.storeA.get('number');
           }
         }
