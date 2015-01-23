@@ -14,31 +14,6 @@ var pipeline = {
       return obj;
     };
 
-    var _sortDependencies = function(unsorted){
-      var sorted = _.filter(unsorted, function(action){return _.isEmpty(action.after);});
-      if (_.isEmpty(sorted)) return false;
-      var sortedOrder = _.pluck(sorted, 'storeKey');
-      var working = _.difference(unsorted, sorted);
-
-      while(!_.isEmpty(working)){
-        var cyclic = true;
-
-        working.forEach(function(action){
-          if(_.every(action.after, function(dep){return sortedOrder.indexOf(dep) >= 0;})){
-            cyclic = false;
-            sorted.push(action);
-            sortedOrder.push(action.storeKey);
-          }
-        });
-
-        if(cyclic) return false;
-
-        working = _.difference(working, sorted);
-      }
-
-      return sorted;
-    };
-
     var canDispatch = false;
     var hasStarted = false;
     var actionQueue = [];
@@ -48,30 +23,57 @@ var pipeline = {
       storeCallbacks: {},
       changedStores: {},
 
-      onAction: function(storeKey, actionKey, after, callback){
-        var that = this;
-        if(this.actionCallbacks[actionKey] == null) this.actionCallbacks[actionKey] = [];
-        var missingDependency = !_.every(after, function(dep) {
-          return _.find(that.actionCallbacks[actionKey], function(action) {
-            return dep === action.storeKey;
+      initialize: function(){
+        for (actionKey in this.actionCallbacks){
+          if (!_isDependencyMissing(actionKey)) _sortDependencies(actionKey);
+          else throw new Error("Missing dependency for action \"" + actionKey + "\"");
+        }
+
+        function _isDependencyMissing(actionKey) {
+          return !_.every(dispatcher.actionCallbacks[actionKey], function(store) {
+            return _.every(store.after, function(dependency){
+              return _.find(dispatcher.actionCallbacks[actionKey], function(store){
+                return store.storeKey === dependency;
+              });
+            });
           });
-        });
+        };
+
+        function _sortDependencies(actionKey){
+          var unsorted = dispatcher.actionCallbacks[actionKey]
+          var sorted = _.filter(unsorted, function(action){return _.isEmpty(action.after);});
+          if (_.isEmpty(sorted)) return false;
+          var sortedOrder = _.pluck(sorted, 'storeKey');
+          var working = _.difference(unsorted, sorted);
+
+          while(!_.isEmpty(working)){
+            var cyclic = true;
+
+            working.forEach(function(action){
+              if(_.every(action.after, function(dep){return sortedOrder.indexOf(dep) >= 0;})){
+                cyclic = false;
+                sorted.push(action);
+                sortedOrder.push(action.storeKey);
+              }
+            });
+
+            if(cyclic) throw new Error("Cyclic dependency");
+
+            working = _.difference(working, sorted);
+          }
+
+          dispatcher.actionCallbacks[actionKey] = sorted;
+        };
+      },
+
+      onAction: function(storeKey, actionKey, after, callback){
+        if(this.actionCallbacks[actionKey] == null) this.actionCallbacks[actionKey] = [];
 
         this.actionCallbacks[actionKey].push({
           storeKey: storeKey,
           after: after || [],
           callback: callback
         });
-
-        if(!missingDependency){
-          var sortedCallbacks = _sortDependencies(this.actionCallbacks[actionKey]);
-          if(sortedCallbacks === false){
-            this.actionCallbacks[actionKey].pop();
-            throw new Error("store \"" + storeKey + "\"'s action \"" + actionKey + "\" creates a circular dependency");
-          } else {
-            this.actionCallbacks[actionKey] = sortedCallbacks;
-          }
-        }
       },
 
       registerStoreCallback: function(storeKey, adapterKey, callback){
@@ -312,6 +314,7 @@ var pipeline = {
 
       start: function(){
         if (!hasStarted) {
+          dispatcher.initialize();
           _.forEach(_initializers.stores, function(init){init();});
           delete _initializers.stores;
           _.forEach(_initializers.adapters, function(init){init();});
