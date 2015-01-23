@@ -274,6 +274,94 @@ describe('While an app is running', function(){
 
   });
 
+  describe('with branching store dependencies', function(){
+    var output, order;
+
+    beforeEach(function(){
+      output = 0;
+      order = [];
+
+      App.createStore('A', {
+        actions: {
+          newNumber: {
+            after: 'B',
+            action: function(){
+              order.push('A');
+              this.update('number', this.stores.B.get('number') * 2);
+            }
+          }
+        }
+      });
+      App.createStore('F', {
+        actions: {
+          newNumber: function(payload){
+            order.push('F');
+            this.update({number: payload.data * 3});
+          }
+        }
+      });
+      App.createStore('E', {
+        actions: {
+          newNumber: function(payload){
+            order.push('E');
+            this.update({number: payload.data * 2});
+          }
+        }
+      });
+
+      App.createStore('B', {
+        actions: {
+          newNumber: {
+            after: ['D', 'E'],
+            action: function(){
+              order.push('B');
+              this.update('number', this.stores.D.get('number') * this.stores.E.get('number'));
+            }
+          }
+        }
+      });
+
+      App.createStore('C', {
+        actions: {
+          newNumber: {
+            after: ['F'],
+            action: function(payload){
+              order.push('C');
+              this.update({number: this.stores.F.get('number') * 3});
+            }
+          }
+        }
+      });
+
+      App.createStore('D', {
+        actions: {
+          newNumber: {
+            after: ['F'],
+            action: function(payload){
+              order.push('D');
+              this.update({number: Math.pow(this.stores.F.get('number'), 2)});
+            }
+          }
+        }
+      });
+
+      App.createAction('newNumber', function(value){
+        return {data: value};
+      });
+
+      App.start();
+      App.actions.newNumber(2);
+    });
+
+    it('triggers reactions in the proper order', function(){
+      expectedOrder = ['F', 'E', 'C', 'D', 'B', 'A'];
+      for(var i = 0; i < order.length; i++){
+        order[i].should.equal(expectedOrder[i]);
+      }
+    });
+
+  });
+
   describe('creating and running another app at the same time', function(){
     var App2, output1, output2;
 
