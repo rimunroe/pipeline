@@ -42,7 +42,7 @@ var pipeline = {
         function _sortDependencies(actionKey){
           var unsorted = dispatcher.actionCallbacks[actionKey]
           var sorted = _.filter(unsorted, function(action){return _.isEmpty(action.after);});
-          if (_.isEmpty(sorted)) return false;
+          if (_.isEmpty(sorted)) throw new Error("Cyclic dependency");
           var sortedOrder = _.pluck(sorted, 'storeKey');
           var working = _.difference(unsorted, sorted);
 
