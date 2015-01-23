@@ -9,93 +9,8 @@ describe('While defining an app', function(){
     App = pipeline.createApp()
   });
 
-  describe('creating a single store', function(){
-
-    it('throws an error when creating a store which depends on itself', function(){
-
-      var createSelfReferencingStore = function(){
-        App.createStore('foo',{
-          after: 'foo'
-        })
-      };
-
-      createSelfReferencingStore.should.throw(Error);
-
-    });
-
-    it('throws an error when using reserved keys in the api object', function(){
-
-      var createStoreWithBadAPIKeys = function(){
-        App.createStore('foo',{
-          api: {
-            stores: undefined
-          }
-        })
-      };
-
-      createStoreWithBadAPIKeys.should.throw(Error);
-
-    });
-
-  });
-
-  describe('creating multiple stores', function(){
-
-    it('throws an error when creating two mutually dependent stores', function(){
-
-      var createCircularReference = function(){
-        App.createStore('foo',{
-          after: 'bar',
-          actions: {
-            boop: function(){}
-          }
-        });
-
-        App.createStore('bar',{
-          after: 'foo',
-          actions: {
-            boop: function(){}
-          }
-        });
-      };
-
-      createCircularReference.should.throw(Error);
-
-    });
-
-    it('throws an error when creating three stores with a circular dependency', function(){
-
-      var createCircularReference = function(){
-        App.createStore('foo',{
-          after: 'bar',
-          actions: {
-            boop: function(){}
-          }
-        });
-
-        App.createStore('bar',{
-          after: 'baz',
-          actions: {
-            boop: function(){}
-          }
-        });
-
-        App.createStore('baz',{
-          after: 'foo',
-          actions: {
-            boop: function(){}
-          }
-        });
-      };
-
-      createCircularReference.should.throw(Error);
-
-    });
-
-    describe('the ways to define dependencies', function(){
-      // TODO
-    });
-
+  describe('the ways to define dependencies', function(){
+    // TODO
   });
 
 });
@@ -156,6 +71,87 @@ describe('While starting an app', function(){
 
   });
 
+  describe('store definition', function(){
+    beforeEach(function(){
+      App = pipeline.createApp();
+    });
+
+    it('throws an error when creating a store which depends on itself', function(){
+
+      var createSelfReferencingStore = function(){
+        App.createStore('foo',{
+          after: 'foo'
+        })
+      };
+
+      createSelfReferencingStore.should.throw(Error);
+
+    });
+
+    it('throws an error when using reserved keys in the api object', function(){
+
+      var createStoreWithBadAPIKeys = function(){
+        App.createStore('foo',{
+          api: {
+            stores: undefined
+          }
+        })
+      };
+
+      createStoreWithBadAPIKeys.should.throw(Error);
+
+    });
+
+    describe('creating multiple stores', function(){
+
+      it('throws an error when creating two mutually dependent stores', function(){
+
+        App.createStore('foo',{
+          after: 'bar',
+          actions: {
+            boop: function(){}
+          }
+        });
+
+        App.createStore('bar',{
+          after: 'foo',
+          actions: {
+            boop: function(){}
+          }
+        });
+
+        App.start.should.throw(Error);
+
+      });
+
+      it('throws an error when creating three stores with a circular dependency', function(){
+
+        App.createStore('foo',{
+          after: 'bar',
+          actions: {
+            boop: function(){}
+          }
+        });
+
+        App.createStore('bar',{
+          after: 'baz',
+          actions: {
+            boop: function(){}
+          }
+        });
+
+        App.createStore('baz',{
+          after: 'foo',
+          actions: {
+            boop: function(){}
+          }
+        });
+
+        App.start.should.throw(Error);
+
+      });
+    });
+  });
 });
 
 describe('While an app is running', function(){
