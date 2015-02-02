@@ -319,7 +319,7 @@ var pipeline = {
         options.key = key;
         options.views = this.views;
 
-        if options.stores?
+        if options.stores
           options.mixins = options.mixins || []
           if (typeof options.stores == 'string') {
             options.stores = [options.stores]
@@ -329,9 +329,9 @@ var pipeline = {
           }
           delete options.stores;
 
-        view = React.createFactory React.createClass options;
-        this.views[key] = view
-        return view
+        view = React.createFactory(React.createClass(options));
+        this.views[key] = view;
+        return view;
       },
 
       start: function(){
