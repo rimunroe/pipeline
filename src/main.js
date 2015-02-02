@@ -143,6 +143,7 @@ var pipeline = {
     return {
       actions: {},
       stores: {},
+      views: {},
 
       createActions: function(actionObject){
         var that = this;
@@ -310,6 +311,27 @@ var pipeline = {
             }
           }
         };
+      },
+
+      createView: function (key, options) {
+        splitKey = key.replace(/([A-Z])/g, " $1");
+        options.displayName = splitKey.charAt(0).toUpperCase() + splitKey.slice(1);
+        options.key = key;
+        options.views = this.views;
+
+        if options.stores?
+          options.mixins = options.mixins || []
+          if (typeof options.stores == 'string') {
+            options.stores = [options.stores]
+          }
+          if (options.stores.length > 0) {
+            options.mixins.push(this.reactMixin(options.stores));
+          }
+          delete options.stores;
+
+        view = React.createFactory React.createClass options;
+        this.views[key] = view
+        return view
       },
 
       start: function(){
