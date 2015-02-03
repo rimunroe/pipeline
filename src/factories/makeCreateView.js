@@ -1,4 +1,4 @@
-pipeline._makeCreateView = function (_app) {
+var _makeCreateView = function (_app) {
 
   var onChange = function (storeName) {
     var StoreName = storeName.charAt(0).toUpperCase() + storeName.slice(1);
@@ -6,38 +6,33 @@ pipeline._makeCreateView = function (_app) {
   }
 
   var reactMixin = function (storeNames, viewName) {
-    mixin = {stores: {}};
-
-    for (storesName in storeNames) {
-      if (!_app.stores[storeName]) {
-        throw new Error("\"" + viewName + "\" tried to subscribe to \"" + storeName + "\", but it didn't exist.  FYI, views must be created after stores.");
-      }
-      mixin.stores[storeName] = _app.stores[storeName];
-    }
-
-    mixin.componentWillMount = function(){
-      for (storeName in storeNames) {
-        changeCb = this[onChange(storeName)]
-        if (_.isFunction(changeCb)) {
-          changeCb();
-          _app.dispatcher.registerStoreCallback(storeName, changeCb, viewName);
-        } else {
-          throw new Error("\"" + viewName + "\" attempted to subscribe to \"" + storeName + "\" but did not have a \"" + onChange(storeName) + "\" method.");
+    return {
+      stores: {},
+      componentWillMount: function(){
+        for (storeName in storeNames) {
+          if (!_app.stores[storeName]) {
+            throw new Error("\"" + viewName + "\" tried to subscribe to \"" + storeName + "\", but it didn't exist.  FYI, views must be created after stores.");
+          }
+          this.stores[storeName] = _app.stores[storeName];
+          changeCb = this[onChange(storeName)]
+          if (_.isFunction(changeCb)) {
+            changeCb();
+            _app.dispatcher.registerStoreCallback(storeName, changeCb, viewName);
+          } else {
+            throw new Error("\"" + viewName + "\" attempted to subscribe to \"" + storeName + "\" but the view did not have a \"" + onChange(storeName) + "\" method.");
+          }
+        }
+      },
+      componentWillUnmount: function(){
+        for (storeName in storeNames) {
+          changeCb = this[onChange(storeName)]
+          if (_.isFunction(changeCb)) {
+            _app.dispatcher.unregisterStoreCallback(storeName, changeCb, viewName);
+          }
         }
       }
     };
-
-    mixin.componentWillUnmount = function(){
-      for (storeName in storeNames) {
-        changeCb = this[onChange(storeName)]
-        if (_.isFunction(changeCb)) {
-          _app.dispatcher.unregisterStoreCallback(storeName, changeCb, viewName);
-        }
-      }
-    };
-
-    return mixin;
-  }
+  };
 
   return function createView (viewName, options) {
 

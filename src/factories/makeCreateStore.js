@@ -1,4 +1,4 @@
-pipeline._makeCreateStore = function (_app) {
+var _makeCreateStore = function (_app) {
   return function createStore (storeName, options){
     if (_app.hasStarted) {
       throw new Error("cannot create new store \"" + storeName + "\". App has already started.");
@@ -96,7 +96,7 @@ pipeline._makeCreateStore = function (_app) {
       _app.dispatcher.onAction(key, actionName, waitFor, fn);
     });
 
-    if (_.isfunction(options.initialize)) {
+    if (_.isFunction(options.initialize)) {
       var _initContext = _.omit(_context, ['actions', 'update']);
       _initContext.update = _mutate;
       _app.initializers.stores.push(options.initialize.bind(_initContext));

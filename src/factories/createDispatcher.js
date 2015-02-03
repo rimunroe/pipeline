@@ -1,4 +1,4 @@
-pipeline._createDispatcher = function (_app) {
+var _createDispatcher = function (_app) {
 
   _isDependencyMissing = function _isDependencyMissing (actionName) {
     return !_.every(actionCallbacks[actionName], function (store) {

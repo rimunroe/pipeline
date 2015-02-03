@@ -1,4 +1,4 @@
-pipeline.makeStart = function (_app) {
+var _makeStart = function (_app) {
   return function start (options) {
     if (!_app.hasStarted) {
       _app.dispatcher.initialize();
@@ -22,5 +22,10 @@ pipeline.makeStart = function (_app) {
         options.initialize.call(_context);
       }
     }
+    delete _app.createAction;
+    delete _app.createStore;
+    delete _app.createAdapter;
+    delete _app.createHelper;
+    delete _app.createView;
   };
 };

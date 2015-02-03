@@ -1,4 +1,4 @@
-pipeline._makeCreateAdapter = function (_app) {
+var _makeCreateAdapter = function (_app) {
   return function createAdapter (adapterName, options) {
 
     var _adapter = {

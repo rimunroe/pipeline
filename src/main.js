@@ -18,12 +18,12 @@ pipeline.createApp = function createApp (options) {
   _app.dispatcher = _createDispatcher(_app);
 
   var app = {
-    createAction: pipeline._makeCreateAction(_app),
-    createStore: pipeline._makeCreateStore(_app),
-    createView: pipeline._makeCreateView(_app),
-    createAdapter: pipeline._makeCreateAdapter(_app),
-    createHelper: pipeline._makeCreateHelper(_app),
-    start: pipeline._makeStart(_app)
+    createAction: _makeCreateAction(_app),
+    createStore: _makeCreateStore(_app),
+    createView: _makeCreateView(_app),
+    createAdapter: _makeCreateAdapter(_app),
+    createHelper: _makeCreateHelper(_app),
+    start: _makeStart(_app)
   };
 
   if (options.debug) {
@@ -33,6 +33,7 @@ pipeline.createApp = function createApp (options) {
     app.adapters = _app.adapters;
     app.helpers = _app.helpers;
     app._dispatcher = _app.dispatcher
+    app.info = _createInfo(_app)
   }
 
   return app;
