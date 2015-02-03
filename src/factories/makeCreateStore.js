@@ -27,7 +27,7 @@ var _makeCreateStore = function (_app) {
       throw new Error("store \"" + storeName + "\" waits for itself");
     }
 
-    var reservedKeys = _.intersection(_.keys(options), ['storeName', 'stores', 'actions', 'get', 'update']);
+    var reservedKeys = _.intersection(_.keys(options), ['storeName', 'stores', 'get', 'update']);
 
     if (!_.isEmpty(reservedKeys)) _.each(reservedKeys, function (reservedKey) {
       throw new Error("In \"" + storeName + "\" Store: \"" + reservedKey + "\" is a reserved key and cannot be used.");
@@ -46,6 +46,7 @@ var _makeCreateStore = function (_app) {
     };
 
     _.extend(_context, {
+      actions: _app.actions,
       storeName: storeName,
       api: {},
       get: function (key){
@@ -57,19 +58,19 @@ var _makeCreateStore = function (_app) {
       }
     });
 
-    var stores = _app.stores
-
     var store = {
-      get: function (key){
+      get: function (key) {
+        _getRef(data, key)
         return _.cloneDeep(key != null ? data[key] : data);
       }
     };
 
-    _.forEach(options.api, function (callback, name){
+    _.forEach(options.api, function (callback, methodName){
+      // todo:  check for colliding public and private methods
       if (name !== 'get') {
         var cb = callback.bind(_context);
-        _context.api[name] = cb;
-        store[name] = cb;
+        _context[methodNme] = cb;
+        store[methodName] = cb;
       }
     });
 
@@ -89,11 +90,11 @@ var _makeCreateStore = function (_app) {
       }
 
       var fn = function (payload){
-        _context.stores = _keyObj(waitFor, function (key){return stores[key];});
-        callback.call(_context, payload);
+        stores = _keyObj(waitFor, function (key){return _app.stores[key];});
+        callback.call(_context, payload, stores);
       };
 
-      _app.dispatcher.onAction(key, actionName, waitFor, fn);
+      _app.dispatcher.onAction(storeName, actionName, waitFor, fn);
     });
 
     if (_.isFunction(options.initialize)) {
