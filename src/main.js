@@ -11,7 +11,8 @@ pipeline.createApp = function createApp (options) {
     stores: {},
     views: {},
     adapters: {},
-    helpers: {}
+    helpers: {},
+    debug: options.debug
   };
 
   _app.dispatcher = _createDispatcher(_app);
@@ -31,6 +32,7 @@ pipeline.createApp = function createApp (options) {
     app.stores = _app.stores;
     app.adapters = _app.adapters;
     app.helpers = _app.helpers;
+    app._dispatcher = _app.dispatcher
   }
 
   return app;
