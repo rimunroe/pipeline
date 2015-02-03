@@ -101,6 +101,9 @@ pipeline._makeCreateStore = function (_app) {
       _initContext.update = _mutate;
       _app.initializers.stores.push(options.initialize.bind(_initContext));
     }
+    if (_app.debug == true || _.contains(_app.debug, storeName)) {
+      store._ctx = _context;
+    }
 
     _app.stores[storeName] = store;
     return store;
