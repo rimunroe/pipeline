@@ -15,15 +15,19 @@ pipeline._makeCreateView = function (_app) {
       mixin.stores[storeName] = _app.stores[storeName];
     }
 
-    mixin.componentDidMount = function(){
+    mixin.componentWillMount = function(){
       for (storeName in storeNames) {
         changeCb = this[onChange(storeName)]
-        if (_.isFunction(changeCb))
+        if (_.isFunction(changeCb)) {
+          changeCb();
           _app.dispatcher.registerStoreCallback(storeName, changeCb, viewName);
+        } else {
+          throw new Error("\"" + viewName + "\" attempted to subscribe to \"" + storeName + "\" but did not have a \"" + onChange(storeName) + "\" method.");
+        }
       }
     };
 
-    mixin.componentWillMount = function(){
+    mixin.componentWillUnmount = function(){
       for (storeName in storeNames) {
         changeCb = this[onChange(storeName)]
         if (_.isFunction(changeCb)) {
