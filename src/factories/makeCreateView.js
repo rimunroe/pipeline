@@ -18,16 +18,16 @@ pipeline._makeCreateView = function (_app) {
     mixin.componentDidMount = function(){
       for (storeName in storeNames) {
         changeCb = this[onChange(storeName)]
-        if _.isFunction(changeCb)
-          _app.dispatcher.registerStoreCallback storeName, changeCb, viewName
+        if (_.isFunction(changeCb))
+          _app.dispatcher.registerStoreCallback(storeName, changeCb, viewName);
       }
-    );
+    };
 
     mixin.componentWillMount = function(){
-      for storeName in storeNames {
+      for (storeName in storeNames) {
         changeCb = this[onChange(storeName)]
-        if _.isFunction(changeCb) {
-          _app.dispatcher.unregisterStoreCallback storeName, changeCb, viewName
+        if (_.isFunction(changeCb)) {
+          _app.dispatcher.unregisterStoreCallback(storeName, changeCb, viewName);
         }
       }
     };
