@@ -1,5 +1,5 @@
 var _makeCreateAction = function (_app) {
-  return function createAction (actionName, packager){
+  return function createAction (actionName, packager) {
     if (_app.hasStarted) {
       throw new Error("cannot create new action \"" + actionName + "\". App has already started.");
     }

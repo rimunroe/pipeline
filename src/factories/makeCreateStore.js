@@ -107,6 +107,7 @@ var _makeCreateStore = function (_app) {
     }
 
     _app.stores[storeName] = store;
+    _app.storeContexts[storeName] = _context
     return store;
   };
 };

@@ -25,6 +25,7 @@ var handleError = function(error){
 gulp.task('build', function(){
   var files = [
     './src/setup.js',
+    './src/helpers/**/*.js',
     './src/factories/**/*.js',
     './src/main.js',
     './src/export.js'

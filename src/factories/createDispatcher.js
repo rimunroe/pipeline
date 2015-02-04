@@ -1,20 +1,20 @@
 var _createDispatcher = function (_app) {
 
-  _isDependencyMissing = function _isDependencyMissing (actionName) {
-    return !_.every(actionCallbacks[actionName], function (store) {
+  var _isDependencyMissing = function _isDependencyMissing (actionName) {
+    return !_.every(_dispatcher.actionCallbacks[actionName], function (store) {
       return _.every(store.after, function (dependency) {
-        return _.find(actionCallbacks[actionName], function (store) {
+        return _.find(_dispatcher.actionCallbacks[actionName], function (store) {
           return store.storeName === dependency;
         });
       });
     });
-  };
+  }
 
-  _sortDependencies = function _sortDependencies (actionName) {
-    var unsorted = dispatcher.actionCallbacks[actionName]
+  var _sortDependencies = function _sortDependencies (actionName) {
+    var unsorted = _dispatcher.actionCallbacks[actionName]
     var sorted = _.filter(unsorted, function (action) {return _.isEmpty(action.after);});
     if (_.isEmpty(sorted)) {
-      throw new Error("Cyclic dependency");
+      throw new Error("Cyclic dependency with action '" + actionName + "'.");
     }
     var sortedOrder = _.pluck(sorted, 'storeName');
     var working = _.difference(unsorted, sorted);
@@ -37,17 +37,21 @@ var _createDispatcher = function (_app) {
       working = _.difference(working, sorted);
     }
 
-    this.actionCallbacks[actionName] = sorted;
+    _dispatcher.actionCallbacks[actionName] = sorted;
   };
 
-  return dispatcher = {
+
+  var _dispatcher = {
     canDispatch: false,
     actionQueue: [],
     actionCallbacks: {},
     storeCallbacks: {},
     changedStores: {},
+  };
+
+  _.extend(_dispatcher, {
     initialize: function () {
-      for (actionName in actionCallbacks) {
+      for (actionName in _dispatcher.actionCallbacks) {
         if (!_isDependencyMissing(actionName)) {
           _sortDependencies(actionName);
         } else {
@@ -56,39 +60,41 @@ var _createDispatcher = function (_app) {
       }
     },
     onAction: function (storeName, actionName, after, callback) {
-      if (this.actionCallbacks[actionName] == null) {
-        dispatcher.actionCallbacks[actionName] = [];
+      if (_dispatcher.actionCallbacks[actionName] == null) {
+        _dispatcher.actionCallbacks[actionName] = [];
       }
 
-      this.actionCallbacks[actionName].push({
+      _dispatcher.actionCallbacks[actionName].push({
         storeName: storeName,
         after: after || [],
         callback: callback
       });
     },
     registerStoreCallback: function (storeName, callback, adapterName) {
-      if (this.storeCallbacks[storeName] == null) {
-        this.storeCallbacks[storeName] = [];
+      if (_dispatcher.storeCallbacks[storeName] == null) {
+        _dispatcher.storeCallbacks[storeName] = [];
       }
-      this.storeCallbacks[storeName].push({
-        adapterKey: adapterKey,
+      storeCallbacks[storeName].push({
+        adapterName: adapterName,
         callback: callback
       });
     },
     unregisterStoreCallback: function (storeName, callback, adapterName) {
-      _.remove(this.storeCallbacks[storeName], callback);
+      _.remove(_dispatcher.storeCallbacks[storeName], function (cb){
+        return cb.callback === callback;
+      });
     },
     storeHasChanged: function (storeName) {
-      this.changedStores[storeName] = true;
+      _dispatcher.changedStores[storeName] = true;
     },
     dispatchAction: function (actionName, payload) {
-      if (this.actionCallbacks[actionName] != null) {
-        _.forEach(this.actionCallbacks[actionName], function (cb) {
+      if (actionCallbacks[actionName] != null) {
+        _.forEach(actionCallbacks[actionName], function (cb) {
           cb.callback(payload);
         });
       }
-      for (var storeName in this.changedStores) {
-        if (this.storeCallbacks[storeName] != null) {
+      for (var storeName in _dispatcher.changedStores) {
+        if (storeCallbacks[storeName] != null) {
           _.forEach(dispatcher.storeCallbacks[storeName], function (cb) {
             cb.callback();
           });
@@ -96,33 +102,35 @@ var _createDispatcher = function (_app) {
       }
     },
     dispatchActions: function () {
-      this.canDispatch = false;
+      _canDispatch = false;
 
       for (var offset = 0; offset < actionQueue.length; offset++) {
         var actionName = actionQueue[offset].actionName;
         var payload = actionQueue[offset].payload;
 
-        this.dispatchAction(actionName, payload);
+        _dispatcher.dispatchAction(actionName, payload);
       }
 
-      this.actionQueue = [];
-      this.canDispatch = true;
+      _dispatcher.actionQueue = [];
+      _dispatcher.canDispatch = true;
     },
     enqueueAction: function (actionName, payload) {
-      actionQueue.push({
+      _dispatcher.actionQueue.push({
         actionName: actionName,
         payload: payload
       });
-      if (this.canDispatch) {
-        this.dispatchActions();
+      if (_canDispatch) {
+        _dispatcher.dispatchActions();
       }
     },
     runStoreCallbacks: function () {
-      for (var storeName in this.changedStores) {
-        if (this.storeCallbacks[storeName] != null) {
-          for (var cb in this.storeCallbacks[storeName]) cb.callback();
+      for (var storeName in _dispatcher.changedStores) {
+        if (storeCallbacks[storeName] != null) {
+          for (var cb in storeCallbacks[storeName]) cb.callback();
         }
       }
     }
-  };
+  });
+
+  return _dispatcher;
 };
