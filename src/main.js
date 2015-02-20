@@ -24,7 +24,7 @@ var pipeline = {
       changedStores: {},
 
       initialize: function(){
-        for (actionKey in this.actionCallbacks){
+        for (var actionKey in this.actionCallbacks){
           if (!_isDependencyMissing(actionKey)) _sortDependencies(actionKey);
           else throw new Error("Missing dependency for action \"" + actionKey + "\"");
         }
@@ -37,25 +37,33 @@ var pipeline = {
               });
             });
           });
-        };
+        }
+
+        // TODO make this section less terrible.
 
         function _sortDependencies(actionKey){
-          var unsorted = dispatcher.actionCallbacks[actionKey]
+          var unsorted = dispatcher.actionCallbacks[actionKey];
           var sorted = _.filter(unsorted, function(action){return _.isEmpty(action.after);});
           if (_.isEmpty(sorted)) throw new Error("Cyclic dependency");
           var sortedOrder = _.pluck(sorted, 'storeKey');
           var working = _.difference(unsorted, sorted);
 
-          while(!_.isEmpty(working)){
-            var cyclic = true;
+          var cyclic = true;
 
-            working.forEach(function(action){
-              if(_.every(action.after, function(dep){return sortedOrder.indexOf(dep) >= 0;})){
-                cyclic = false;
-                sorted.push(action);
-                sortedOrder.push(action.storeKey);
-              }
-            });
+          var _dependenciesExist = function(dep){return sortedOrder.indexOf(dep) >= 0;};
+
+          var _removeDependenciesFromWorkingList = function(action){
+            if(_.every(action.after, _dependenciesExist)){
+              cyclic = false;
+              sorted.push(action);
+              sortedOrder.push(action.storeKey);
+            }
+          };
+
+          while(!_.isEmpty(working)){
+            cyclic = true;
+
+            working.forEach(_removeDependenciesFromWorkingList);
 
             if(cyclic) throw new Error("Cyclic dependency");
 
@@ -63,7 +71,7 @@ var pipeline = {
           }
 
           dispatcher.actionCallbacks[actionKey] = sorted;
-        };
+        }
       },
 
       onAction: function(storeKey, actionKey, after, callback){
@@ -211,7 +219,7 @@ var pipeline = {
           }
         });
 
-        var stores = this.stores
+        var stores = this.stores;
 
         var store = {
           get: function(key){
