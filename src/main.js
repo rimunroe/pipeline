@@ -92,8 +92,10 @@ var pipeline = {
         });
       },
 
-      unregisterStoreCallback: function(storeKey, callback){
-        _.remove(this.storeCallbacks[storeKey], callback);
+      unregisterStoreCallback: function(storeKey, adapterKey, callback){
+        _.remove(this.storeCallbacks[storeKey], function(cb){
+          return (cb.adapterKey === adapterKey) && (cb.callback === callback);
+        });
       },
 
       storeHasChanged: function(storeKey){
@@ -314,7 +316,7 @@ var pipeline = {
               var storeKey = stores[i];
               StoreKey = storeKey.charAt(0).toUpperCase() + storeKey.slice(1);
               cb = this["on" + StoreKey + "Change"];
-              if (_.isFunction(cb)) dispatcher.unregisterStoreCallback(storeKey, cb);
+              if (_.isFunction(cb)) dispatcher.unregisterStoreCallback(storeKey, 'react-view', cb);
             }
           }
         };
