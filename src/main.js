@@ -108,9 +108,9 @@ var pipeline = {
         }
         for (var storeKey in this.changedStores) {
           if (this.storeCallbacks[storeKey] != null) {
-            _.forEach(this.storeCallbacks[storeKey], function(cb){
-              cb.callback();
-            });
+            for (var i = 0; i < this.storeCallbacks[storeKey].length; i++) {
+              this.storeCallbacks[storeKey][i].callback();
+            }
           }
         }
       },
