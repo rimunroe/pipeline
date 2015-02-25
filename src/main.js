@@ -7,6 +7,7 @@ pipeline = {
         stores: [],
         adapters: []
       },
+      startHooks: {},
       hasStarted: false,
       actions: {},
       stores: {},
@@ -14,6 +15,7 @@ pipeline = {
       views: {},
       adapters: {},
       helpers: {},
+      plugins: {},
       debug: options.debug
     };
 

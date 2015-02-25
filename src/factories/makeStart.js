@@ -11,6 +11,11 @@ var _makeStart = function (_app) {
 
     _app.dispatcher.canDispatch = true;
 
+    _.forEach(_app.startHooks, function(hook, pluginName){
+      console.log("Running plugin \"" + pluginName + "\"'s start hook");
+      hook.call(_app);
+    });
+
     if (_.isFunction(_app.initializers.app)) {
       var _context = {
         stores: _app.stores,
