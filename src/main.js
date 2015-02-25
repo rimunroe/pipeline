@@ -17,6 +17,8 @@ pipeline = {
       debug: options.debug
     };
 
+    _app.usePlugin  = _makeUsePlugin(_app);
+
     _app.status = _createStatus(_app);
 
     _app.load = _createLoad(_app);
@@ -47,6 +49,8 @@ pipeline = {
     _app.start = _makeStart(_app);
 
     _app.dispatcher = _createDispatcher(_app);
+
+    for (var plugin in options.plugin) _app.use(plugin);
 
     var app = _.omit(_app, ['dispatcher', 'debug', 'initializers', 'hasStarted', 'status', 'dispatcher', 'storeContexts']);
 
