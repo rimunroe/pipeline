@@ -40,10 +40,10 @@ var _makeCreateView = function (_app) {
       throw new Error("cannot create new view \"" + viewName + "\". App has already started.");
     }
 
-    var stores = _.isString(options.stores) ? [options.stores] : options.stores;
+    var storeNames = _.isString(options.stores) ? [options.stores] : options.stores;
     delete options.stores;
 
-    if (storeNames) {
+    if (storeNames != null) {
       for (var storeName in StoreNames){
         if (!_.isFunction(options[onChange(storeName)])) {
           console.warn("\"" + viewName + "\" did not have an \"" + onChange(storeName) + "\" function but listens to \"" + storeName + "\".");
