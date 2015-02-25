@@ -5,20 +5,16 @@ var _makeCreateAction = function (_app) {
     }
 
     var action = function (){
-      if (!_app.hasStarted) {
-        throw new Error("Action \"" + actionName + "\" attempted to fire before the app was started.");
-      } else {
-        var payload = packager.apply(null, arguments);
-        _app.dispatcher.enqueueAction(actionName, typeof payload === 'object' ? payload : {});
-      }
-      return payload ? true : false
+      var payload = packager.apply(null, arguments);
+      _app.dispatcher.enqueueAction(actionName, typeof payload === 'object' ? payload : {});
+      return payload ? true : false;
     };
 
-    action.actionName = actionName
+    action.actionName = actionName;
 
     _app.actions[actionName] = action;
 
-    return action
+    return action;
 
   };
 };

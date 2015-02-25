@@ -2,7 +2,7 @@ var _makeCreateAdapter = function (_app) {
   return function createAdapter (adapterName, options) {
 
     var _adapter = {
-      adapterName: adapterName,
+      name: adapterName,
       stores: _app.stores,
       actions: _app.actions
     };
@@ -16,7 +16,7 @@ var _makeCreateAdapter = function (_app) {
     });
 
     _.forEach(options.stores, function (callback, storeName){
-      _app.dispatcher.registerStoreCallback(storeName, adapterName, callback.bind(_adapter));
+      _app.dispatcher.registerStoreCallback(storeName, callback.bind(_adapter), adapterName);
     });
 
     if (_.isFunction(options.initialize)) {

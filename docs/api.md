@@ -20,7 +20,7 @@ App.start().
 * `this.actions`: Object containing all the actions.
 * `this.stores`: Object containing all stores.
 
-## `App.createAction(name, packager)`
+## `App.create.action(name, packager)`
 
 Creates a new action in the app.
 
@@ -33,7 +33,7 @@ A string name for the action. All actions must have different names.
 A function that returns an object. All things that react to this action will
 take the return of this function as their argument.
 
-## `App.createStore(name, options)`
+## `App.create.store(name, options)`
 
 ### name
 
@@ -91,7 +91,7 @@ These functions will be available to anything with a reference to the store.
 }
 ```
 
-## `App.createAdapter(name, options)`
+## `App.create.adapter(name, options)`
 
 ### name
 

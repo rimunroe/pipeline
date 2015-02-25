@@ -1,6 +1,6 @@
 var _makeStart = function (_app) {
 
-  var _start = function (options) {
+  var _start = function () {
     _app.dispatcher.initialize();
     _.forEach(_app.initializers.stores, function (init){init();});
     delete _app.initializers.stores;
@@ -11,25 +11,25 @@ var _makeStart = function (_app) {
 
     _app.dispatcher.canDispatch = true;
 
-    if ((options != null) && _.isFunction(options.initialize)) {
+    if (_.isFunction(_app.initializers.app)) {
       var _context = {
         stores: _app.stores,
         actions: _app.actions,
         helpers: _app.helpers
       };
-      options.initialize.call(_context);
+      _app.initializers.app.call(_context);
     }
     _app.hasStarted = true;
   };
 
-  return function start (options) {
+  return function start () {
     if (!_app.hasStarted) {
-      _start(options);
+      _start();
       delete _app.app.create;
       delete _app.app.load;
       delete _app.app.start;
     } else {
-      console.log("App '" + _app.appName + "' was already started.");
+      console.log("App was already started.");
     }
   };
 };

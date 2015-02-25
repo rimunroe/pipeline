@@ -6,10 +6,10 @@ var _createStatus = function (_app) {
     } else if (item === 'dispatcher') {
       console.log(_app.dispatcher);
     }
-  }
+  };
 
   return function status (){
-    var args = (arguments.length >= 1) ? [].prototype.slice.call(arguments) : []
+    var args = (arguments.length >= 1) ? [].prototype.slice.call(arguments) : [];
     _.each(args, _status);
   };
 };

@@ -6,22 +6,24 @@ var _makeCreateHelper = function (_app) {
 
     var _context = {
       helpers: _app.helpers
-    }
+    };
 
     var helper = function (){
       fxn.apply(_context, arguments);
-    }
-    helper.helperName = helperName;
+    };
+
+    helper.name = helperName;
 
     var keys = helperName.split('.');
     var slot = _app.helpers;
-    var namespaces = keys.slice(0, -1)
-    var lastKey = keys.slice(-1)[0]
+    var namespaces = keys.slice(0, -1);
+    var lastKey = keys.slice(-1)[0];
+
     _.each(namespaces, function (key) {
       if (!slot[key]) {
         slot[key] = {};
       }
-      slot = slot[key]
+      slot = slot[key];
     });
 
     slot[lastKey] = helper;

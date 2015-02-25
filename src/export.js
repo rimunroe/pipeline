@@ -4,4 +4,4 @@ if (isNode) {
   window.pipeline = pipeline;
 }
 
-}).call(this)
+}).call(this);
