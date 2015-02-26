@@ -1,3 +1,5 @@
+var _ = require('lodash');
+
 module.exports = function (_app) {
   return function (imports) {
     _.each(imports, function (val, key) {

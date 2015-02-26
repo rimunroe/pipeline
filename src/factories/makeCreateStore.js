@@ -1,3 +1,5 @@
+var _ = require('lodash');
+
 module.exports = function (_app) {
 
   var _keyObj = function(array, callback){

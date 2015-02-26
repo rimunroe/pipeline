@@ -1,3 +1,5 @@
+var _ = require('lodash');
+
 module.exports = function (_app) {
   return function createHelper (helperName, fxn) {
     if (_app.hasStarted) {

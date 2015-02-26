@@ -1,3 +1,5 @@
+var _ = require('lodash');
+
 var _createStatus = require('./factories/createStatus');
 var _createLoad = require('./factories/createLoad');
 var _makeCreateAction = require('./factories/makeCreateAction');
