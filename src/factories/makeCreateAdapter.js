@@ -1,4 +1,4 @@
-var _makeCreateAdapter = function (_app) {
+module.exports = function (_app) {
   return function createAdapter (adapterName, options) {
 
     var _adapter = {

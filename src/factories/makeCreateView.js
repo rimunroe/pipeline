@@ -1,4 +1,4 @@
-var _makeCreateView = function (_app) {
+module.exports = function (_app) {
 
   var onChange = function (storeName) {
     var StoreName = storeName.charAt(0).toUpperCase() + storeName.slice(1);

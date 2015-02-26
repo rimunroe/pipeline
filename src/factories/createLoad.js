@@ -1,4 +1,4 @@
-var _createLoad = function (_app) {
+module.exports = function (_app) {
   return function (imports) {
     _.each(imports, function (val, key) {
       if (key === 'helpers') {

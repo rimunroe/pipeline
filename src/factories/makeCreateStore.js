@@ -1,4 +1,4 @@
-var _makeCreateStore = function (_app) {
+module.exports = function (_app) {
 
   var _keyObj = function(array, callback){
     var obj = {};

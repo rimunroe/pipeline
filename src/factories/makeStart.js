@@ -1,4 +1,4 @@
-var _makeStart = function (_app) {
+module.exports = function (_app) {
 
   var _start = function () {
     _app.dispatcher.initialize();

@@ -1,4 +1,4 @@
-var _createStatus = function (_app) {
+module.exports = function (_app) {
 
   var _status = function _status (item) {
     if (item === 'stores') {

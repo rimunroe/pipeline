@@ -1,4 +1,4 @@
-var _createDispatcher = function (_app) {
+module.exports = function (_app) {
 
   var _dispatcher = {
     canDispatch: false,
