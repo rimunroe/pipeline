@@ -6,7 +6,7 @@ describe('While defining an app', function(){
   var App;
 
   beforeEach(function(){
-    App = pipeline.createApp()
+    App = pipeline.createApp();
   });
 
   describe('the ways to define dependencies', function(){
@@ -29,13 +29,13 @@ describe('While starting an app', function(){
         }
       });
 
-      App.createStore('foo', {
+      App.create.store('foo', {
         initialize: function(){
           order.push('store');
         }
       });
 
-      App.createAdapter('boop', {
+      App.create.adapter('boop', {
         initialize: function(){
           order.push('adapter');
         }
@@ -79,9 +79,9 @@ describe('While starting an app', function(){
     it('throws an error when creating a store which depends on itself', function(){
 
       var createSelfReferencingStore = function(){
-        App.createStore('foo',{
+        App.create.store('foo',{
           after: 'foo'
-        })
+        });
       };
 
       createSelfReferencingStore.should.throw(Error);
@@ -91,13 +91,12 @@ describe('While starting an app', function(){
     it('throws an error when using reserved keys in the api object', function(){
 
       var createStoreWithBadAPIKeys = function(){
-        App.createStore('foo',{
+        App.create.store('foo',{
           api: {
             stores: undefined
           }
-        })
+        });
       };
-
       createStoreWithBadAPIKeys.should.throw(Error);
 
     });
@@ -106,14 +105,14 @@ describe('While starting an app', function(){
 
       it('throws an error when creating two mutually dependent stores', function(){
 
-        App.createStore('foo',{
+        App.create.store('foo',{
           after: 'bar',
           actions: {
             boop: function(){}
           }
         });
 
-        App.createStore('bar',{
+        App.create.store('bar',{
           after: 'foo',
           actions: {
             boop: function(){}
@@ -126,21 +125,21 @@ describe('While starting an app', function(){
 
       it('throws an error when creating three stores with a circular dependency', function(){
 
-        App.createStore('foo',{
+        App.create.store('foo',{
           after: 'bar',
           actions: {
             boop: function(){}
           }
         });
 
-        App.createStore('bar',{
+        App.create.store('bar',{
           after: 'baz',
           actions: {
             boop: function(){}
           }
         });
 
-        App.createStore('baz',{
+        App.create.store('baz',{
           after: 'foo',
           actions: {
             boop: function(){}
@@ -162,18 +161,18 @@ describe('While an app is running', function(){
   });
 
   it('is not possible to create new actions', function(){
-    App.start()
+    App.start();
     createAction = function(){
-      App.createAction('foo', function(){});
-    }
+      App.create.action('foo', function(){});
+    };
     createAction.should.throw(Error);
   });
 
   it('is not possible to create new stores', function(){
-    App.start()
+    App.start();
     createStore = function(){
-      App.createStore('foo', function(){});
-    }
+      App.create.store('foo', function(){});
+    };
     createStore.should.throw(Error);
   });
 
@@ -186,11 +185,11 @@ describe('While an app is running', function(){
 
     it('resolves synchronously', function(){
 
-      App.createAction('anAction', function(value){
+      App.create.action('anAction', function(value){
         return {data: value};
       });
 
-      App.createStore('aStore', {
+      App.create.store('aStore', {
         actions: {
           anAction: function(payload){
             this.update({number: payload.data});
@@ -198,7 +197,7 @@ describe('While an app is running', function(){
         }
       });
 
-      App.createAdapter('anAdapter', {
+      App.create.adapter('anAdapter', {
         stores: {
           aStore: function(){
             output = this.stores.aStore.get('number');
@@ -223,19 +222,19 @@ describe('While an app is running', function(){
       output = 0;
       order = [];
 
-      App.createStore('storeA', {
+      App.create.store('storeA', {
         actions: {
           newNumber: {
             after: 'storeB',
-            action: function(){
+            action: function(payload, stores){
               order.push('storeA');
-              this.update('number', this.stores.storeB.get('number') * 2);
+              this.update('number', stores.storeB.get('number') * 2);
             }
           }
         }
       });
 
-      App.createStore('storeB', {
+      App.create.store('storeB', {
         actions: {
           newNumber: function(payload){
             order.push('storeB');
@@ -244,7 +243,7 @@ describe('While an app is running', function(){
         }
       });
 
-      App.createAdapter('anAdapter', {
+      App.create.adapter('anAdapter', {
         stores: {
           storeA: function(){
             order.push('anAdapter');
@@ -253,7 +252,7 @@ describe('While an app is running', function(){
         }
       });
 
-      App.createAction('newNumber', function(value){
+      App.create.action('newNumber', function(value){
         return {data: value};
       });
 
@@ -277,18 +276,18 @@ describe('While an app is running', function(){
       output = 0;
       order = [];
 
-      App.createStore('A', {
+      App.create.store('A', {
         actions: {
           newNumber: {
             after: 'B',
-            action: function(){
+            action: function(payload, stores){
               order.push('A');
-              this.update('number', this.stores.B.get('number') * 2);
+              this.update('number', stores.B.get('number') * 2);
             }
           }
         }
       });
-      App.createStore('F', {
+      App.create.store('F', {
         actions: {
           newNumber: function(payload){
             order.push('F');
@@ -296,7 +295,7 @@ describe('While an app is running', function(){
           }
         }
       });
-      App.createStore('E', {
+      App.create.store('E', {
         actions: {
           newNumber: function(payload){
             order.push('E');
@@ -305,43 +304,43 @@ describe('While an app is running', function(){
         }
       });
 
-      App.createStore('B', {
+      App.create.store('B', {
         actions: {
           newNumber: {
             after: ['D', 'E'],
-            action: function(){
+            action: function(payload, stores){
               order.push('B');
-              this.update('number', this.stores.D.get('number') * this.stores.E.get('number'));
+              this.update('number', stores.D.get('number') * stores.E.get('number'));
             }
           }
         }
       });
 
-      App.createStore('C', {
+      App.create.store('C', {
         actions: {
           newNumber: {
             after: ['F'],
-            action: function(payload){
+            action: function(payload, stores){
               order.push('C');
-              this.update({number: this.stores.F.get('number') * 3});
+              this.update({number: stores.F.get('number') * 3});
             }
           }
         }
       });
 
-      App.createStore('D', {
+      App.create.store('D', {
         actions: {
           newNumber: {
             after: ['F'],
-            action: function(payload){
+            action: function(payload, stores){
               order.push('D');
-              this.update({number: Math.pow(this.stores.F.get('number'), 2)});
+              this.update({number: Math.pow(stores.F.get('number'), 2)});
             }
           }
         }
       });
 
-      App.createAction('newNumber', function(value){
+      App.create.action('newNumber', function(value){
         return {data: value};
       });
 
@@ -367,18 +366,18 @@ describe('While an app is running', function(){
 
       App2 = pipeline.createApp();
 
-      App.createStore('storeA', {
+      App.create.store('storeA', {
         actions: {
           newNumber: {
             after: 'storeB',
-            action: function(){
-              this.update('number', this.stores.storeB.get('number') * 2);
+            action: function(payload, stores){
+              this.update('number', stores.storeB.get('number') * 2);
             }
           }
         }
       });
 
-      App.createStore('storeB', {
+      App.create.store('storeB', {
         actions: {
           newNumber: function(payload){
             this.update({number: payload.data});
@@ -386,7 +385,7 @@ describe('While an app is running', function(){
         }
       });
 
-      App.createAdapter('anAdapter', {
+      App.create.adapter('anAdapter', {
         stores: {
           storeA: function(){
             output1 = this.stores.storeA.get('number');
@@ -394,17 +393,17 @@ describe('While an app is running', function(){
         }
       });
 
-      App.createAction('newNumber', function(value){
+      App.create.action('newNumber', function(value){
         return {data: value};
       });
 
       App.start();
 
-      App2.createAction('newNumber', function(value){
+      App2.create.action('newNumber', function(value){
         return {data: value};
       });
 
-      App2.createAdapter('anAdapter', {
+      App2.create.adapter('anAdapter', {
         stores: {
           storeA: function(){
             output2 = this.stores.storeA.get('number');
@@ -412,7 +411,7 @@ describe('While an app is running', function(){
         }
       });
 
-      App2.createStore('storeB', {
+      App2.create.store('storeB', {
         actions: {
           newNumber: function(payload){
             this.update({number: payload.data});
@@ -420,12 +419,12 @@ describe('While an app is running', function(){
         }
       });
 
-      App2.createStore('storeA', {
+      App2.create.store('storeA', {
         actions: {
           newNumber: {
             after: 'storeB',
-            action: function(){
-              this.update('number', this.stores.storeB.get('number') * 2);
+            action: function(payload, stores){
+              this.update('number', stores.storeB.get('number') * 2);
             }
           }
         }
@@ -444,5 +443,3 @@ describe('While an app is running', function(){
   });
 
 });
-
-

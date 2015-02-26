@@ -1,350 +1,61 @@
-var pipeline = {
-  createApp: function(options){
-    var _initializers = {
-      stores: [],
-      adapters: []
-    };
+pipeline = {
+  createApp: function (options) {
+    options = options || {};
 
-    var _keyObj = function(array, callback){
-      var obj = {};
-      for(var i = 0; i < array.length; i++){
-        var key = array[i];
-        obj[key] = callback(key);
-      }
-      return obj;
-    };
-
-    var canDispatch = false;
-    var hasStarted = false;
-    var actionQueue = [];
-
-    var dispatcher = {
-      actionCallbacks: {},
-      storeCallbacks: {},
-      changedStores: {},
-
-      initialize: function(){
-        for (var actionKey in this.actionCallbacks){
-          if (!_isDependencyMissing(actionKey)) _sortDependencies(actionKey);
-          else throw new Error("Missing dependency for action \"" + actionKey + "\"");
-        }
-
-        function _isDependencyMissing(actionKey) {
-          return !_.every(dispatcher.actionCallbacks[actionKey], function(store) {
-            return _.every(store.after, function(dependency){
-              return _.find(dispatcher.actionCallbacks[actionKey], function(store){
-                return store.storeKey === dependency;
-              });
-            });
-          });
-        }
-
-        // TODO make this section less terrible.
-
-        function _sortDependencies(actionKey){
-          var unsorted = dispatcher.actionCallbacks[actionKey];
-          var sorted = _.filter(unsorted, function(action){return _.isEmpty(action.after);});
-          if (_.isEmpty(sorted)) throw new Error("Cyclic dependency");
-          var sortedOrder = _.pluck(sorted, 'storeKey');
-          var working = _.difference(unsorted, sorted);
-
-          var cyclic = true;
-
-          var _dependenciesExist = function(dep){return sortedOrder.indexOf(dep) >= 0;};
-
-          var _removeDependenciesFromWorkingList = function(action){
-            if(_.every(action.after, _dependenciesExist)){
-              cyclic = false;
-              sorted.push(action);
-              sortedOrder.push(action.storeKey);
-            }
-          };
-
-          while(!_.isEmpty(working)){
-            cyclic = true;
-
-            working.forEach(_removeDependenciesFromWorkingList);
-
-            if(cyclic) throw new Error("Cyclic dependency");
-
-            working = _.difference(working, sorted);
-          }
-
-          dispatcher.actionCallbacks[actionKey] = sorted;
-        }
+    var _app = {
+      initializers: {
+        stores: [],
+        adapters: []
       },
-
-      onAction: function(storeKey, actionKey, after, callback){
-        if(this.actionCallbacks[actionKey] == null) this.actionCallbacks[actionKey] = [];
-
-        this.actionCallbacks[actionKey].push({
-          storeKey: storeKey,
-          after: after || [],
-          callback: callback
-        });
-      },
-
-      registerStoreCallback: function(storeKey, adapterKey, callback){
-        if(this.storeCallbacks[storeKey] == null) this.storeCallbacks[storeKey] = [];
-        this.storeCallbacks[storeKey].push({
-          adapterKey: adapterKey,
-          callback: callback
-        });
-      },
-
-      unregisterStoreCallback: function(storeKey, adapterKey, callback){
-        _.remove(this.storeCallbacks[storeKey], function(cb){
-          return (cb.adapterKey === adapterKey) && (cb.callback === callback);
-        });
-      },
-
-      storeHasChanged: function(storeKey){
-        this.changedStores[storeKey] = true;
-      },
-
-      dispatchAction: function(actionKey, payload){
-        if (this.actionCallbacks[actionKey] != null) {
-          _.forEach(this.actionCallbacks[actionKey], function(cb){
-            cb.callback(payload);
-          });
-        }
-        for (var storeKey in this.changedStores) {
-          if (this.storeCallbacks[storeKey] != null) {
-            for (var i = 0; i < this.storeCallbacks[storeKey].length; i++) {
-              this.storeCallbacks[storeKey][i].callback();
-            }
-          }
-        }
-      },
-
-      dispatchActions: function(){
-        canDispatch = false;
-
-        var that = this;
-
-        for (var offset = 0; offset < actionQueue.length; offset++) {
-          var actionKey = actionQueue[offset].actionKey;
-          var payload = actionQueue[offset].payload;
-
-          this.dispatchAction(actionKey, payload);
-        }
-
-        actionQueue = [];
-        canDispatch = true;
-      },
-
-      enqueueAction: function(actionKey, payload){
-        actionQueue.push({
-          actionKey: actionKey,
-          payload: payload
-        });
-        if (canDispatch) this.dispatchActions();
-      },
-
-      runStoreCallbacks: function(){
-        for (var storeKey in this.changedStores) {
-          if (this.storeCallbacks[storeKey] != null) {
-            for (var cb in this.storeCallbacks[storeKey]) cb.callback();
-          }
-        }
-      }
-    };
-
-    return {
+      hasStarted: false,
       actions: {},
       stores: {},
-
-      createActions: function(actionObject){
-        var that = this;
-        _.forEach(actionObject, function(packager, actionKey){
-          that.createAction(actionKey, packager);
-        });
-      },
-
-      createAction: function(actionKey, packager){
-        if (hasStarted) throw new Error("cannot create new action \"" + actionKey + "\". App has already started.");
-        var that = this;
-        this.actions[actionKey] = function(){
-          var payload = packager.apply(null, arguments);
-          dispatcher.enqueueAction(actionKey, typeof payload === 'object' ? payload : {});
-        };
-      },
-
-      createStore: function(key, options){
-        if (hasStarted) throw new Error("cannot create new store \"" + key + "\". App has already started.");
-        var callbacks = [];
-        var data = {};
-
-        var _mutate = function(updates, value){
-          if (typeof updates === 'object') {
-            for (var key in updates) data[key] = updates[key];
-          } else if (typeof updates === 'string') data[updates] = value;
-        };
-
-        var after;
-
-        if (typeof options.after === 'string') {
-          after = [options.after];
-        } else if (Array.isArray(options.after)) {
-          after = options.after;
-        } else {
-          after = [];
-        }
-
-        if (after.indexOf(key) >= 0) throw new Error("store \"" + key + "\" waits for itself");
-
-        var reservedKeys = _.intersection(_.keys(options), ['stores', 'key', 'get', 'update']);
-
-        if (!_.isEmpty(reservedKeys)) _.each(reservedKeys, function(reservedKey) {
-          throw new Error("In \"" + key + "\" Store: \"" + reservedKey + "\" is a reserved key and cannot be used.");
-        });
-
-        var _context = _.omit(options, ['initialize', 'api', 'actions']);
-
-        _.each(_context, function(prop, key){
-          if (_.isFunction(prop)) _context[key] = prop.bind(_context);
-        });
-
-        var _trigger = function(){
-          dispatcher.storeHasChanged(key);
-        };
-
-        _.extend(_context, {
-          key: key,
-          api: {},
-          get: function(key){
-            return _.clone(key != null ? data[key] : data);
-          },
-          update: function(updates, value){
-            _mutate(updates, value);
-            _trigger();
-          }
-        });
-
-        var stores = this.stores;
-
-        var store = {
-          get: function(key){
-            return _.cloneDeep(key != null ? data[key] : data);
-          }
-        };
-
-        _.forEach(options.api, function(callback, name){
-          if (name !== 'get') {
-            var cb = callback.bind(_context);
-            _context.api[name] = cb;
-            store[name] = cb;
-          }
-        });
-
-        _.forEach(options.actions, function(action, actionKey){
-          var waitFor;
-          var callback;
-
-          if (typeof action === 'function'){
-            waitFor = after;
-            callback = action;
-          } else {
-            if ((key === action.after) || (action.after.indexOf(key) >= 0)){
-              throw new Error("on action \"" + actionKey + "\", store \"" + key + "\" waits for itself to update");
-            }
-            waitFor = _.unique(after.concat(action.after));
-            callback = action.action;
-          }
-
-          var fn = function(payload){
-            _context.stores = _keyObj(waitFor, function(key){return stores[key];});
-            callback.call(_context, payload);
-          };
-
-          dispatcher.onAction(key, actionKey, waitFor, fn);
-        });
-
-        if (_.isFunction(options.initialize)) {
-          var _initContext = _.omit(_context, ['actions', 'update']);
-          _initContext.update = _mutate;
-          _initializers.stores.push(options.initialize.bind(_initContext));
-        }
-
-        this.stores[key] = store;
-        return store;
-      },
-
-      createAdapter: function(key, options){
-        var _context = {
-          key: key,
-          stores: this.stores,
-          actions: this.actions
-        };
-
-        _.forEach(_.omit(options, ['stores', 'initialize']), function(property, name){
-          if (_.isFunction(property)) _context[name] = property.bind(_context);
-        });
-
-        _.forEach(options.stores, function(callback, storeKey){
-          dispatcher.registerStoreCallback(storeKey, key, callback.bind(_context));
-        });
-
-        if (_.isFunction(options.initialize)) {
-          _initializers.adapters.push(options.initialize.bind(_.omit(_context, 'actions')));
-        }
-      },
-
-      reactMixin: function(stores) {
-        if (_.isString(stores)) stores = [stores];
-
-        storesObj = {};
-
-        for (var i = 0; i < stores.length; i++) {
-          var storeKey = stores[i];
-          storesObj[storeKey] = this.stores[storeKey];
-        }
-        return {
-          stores: storesObj,
-          actions: this.actions,
-
-          componentDidMount: function() {
-            for (var i = 0; i < stores.length; i++) {
-              var storeKey = stores[i];
-              StoreKey = storeKey.charAt(0).toUpperCase() + storeKey.slice(1);
-              cb = this["on" + StoreKey + "Change"];
-              if (_.isFunction(cb)) dispatcher.registerStoreCallback(storeKey, 'react-view', cb);
-            }
-          },
-          componentWillUnmount: function() {
-            for (var i = 0; i < stores.length; i++) {
-              var storeKey = stores[i];
-              StoreKey = storeKey.charAt(0).toUpperCase() + storeKey.slice(1);
-              cb = this["on" + StoreKey + "Change"];
-              if (_.isFunction(cb)) dispatcher.unregisterStoreCallback(storeKey, 'react-view', cb);
-            }
-          }
-        };
-      },
-
-      start: function(){
-        if (!hasStarted) {
-          dispatcher.initialize();
-          _.forEach(_initializers.stores, function(init){init();});
-          delete _initializers.stores;
-          _.forEach(_initializers.adapters, function(init){init();});
-          delete _initializers.adapters;
-
-          dispatcher.runStoreCallbacks();
-
-          canDispatch = true;
-          hasStarted = true;
-
-          if ((options != null) && _.isFunction(options.initialize)) {
-            var _context = {
-              stores: this.stores,
-              actions: this.actions
-            };
-
-            options.initialize.call(_context);
-          }
-        }
-      }
+      storeContexts: {},
+      views: {},
+      adapters: {},
+      helpers: {},
+      debug: options.debug
     };
+
+    _app.status = _createStatus(_app);
+
+    _app.load = _createLoad(_app);
+
+    var createAction = _makeCreateAction(_app);
+    var createStore = _makeCreateStore(_app);
+    var createView = _makeCreateView(_app);
+    var createAdapter = _makeCreateAdapter(_app);
+    var createHelper = _makeCreateHelper(_app);
+
+    _app.create = {
+      action: createAction,
+      actions: _handleMany(createAction),
+      store: createStore,
+      stores: _handleMany(createStore),
+      view: createView,
+      views: _handleMany(createView),
+      adapter: createAdapter,
+      adapters: _handleMany(createAdapter),
+      helper: createHelper,
+      helpers: _handleMany(createHelper)
+    };
+
+    if (_.isFunction(options.initialize)) {
+      _app.initializers.app = options.initialize;
+    }
+
+    _app.start = _makeStart(_app);
+
+    _app.dispatcher = _createDispatcher(_app);
+
+    var app = _.omit(_app, ['dispatcher', 'debug', 'initializers', 'hasStarted', 'status', 'dispatcher', 'storeContexts']);
+
+    _app.app = app;
+
+    if (options.debug) {
+      app._ctx = _app;
+    }
+
+    return app;
   }
 };
