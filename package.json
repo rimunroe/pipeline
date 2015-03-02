@@ -4,7 +4,7 @@
   "description": "A tiny Flux framework with strong opinions",
   "main": "pipeline.js",
   "scripts": {
-    "test": "node_modules/mocha/bin/mocha"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
