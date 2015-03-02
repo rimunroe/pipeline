@@ -4,7 +4,8 @@
   "description": "A tiny Flux framework with strong opinions",
   "main": "pipeline.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "build": "webpack && webpack --config webpack.config.min.js"
   },
   "repository": {
     "type": "git",
