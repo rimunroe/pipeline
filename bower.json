@@ -14,11 +14,7 @@
   "ignore": [
     "**/.*",
     "node_modules",
-    "dist",
-    "gulpfile.js",
-    "npm",
     "package.json",
-    "rails",
     "src"
   ],
   "dependencies": {
