@@ -1,5 +1,5 @@
 {
-  "name": "pipeline",
+  "name": "pipeline-flux",
   "version": "0.0.5",
   "description": "A tiny Flux framework with strong opinions",
   "main": "pipeline.js",
