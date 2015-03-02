@@ -7,7 +7,6 @@
   ],
   "main": "pipeline.js",
   "moduleType": [
-    "globals",
     "node"
   ],
   "license": "MIT",
