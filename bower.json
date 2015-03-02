@@ -5,7 +5,7 @@
   "authors": [
     "Richard Munroe"
   ],
-  "main": "bower/pipeline.js",
+  "main": "pipeline.js",
   "moduleType": [
     "globals",
     "node"
