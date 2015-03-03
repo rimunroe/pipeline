@@ -4,7 +4,6 @@ var _createStatus = require('./factories/createStatus');
 var _createLoad = require('./factories/createLoad');
 var _makeCreateAction = require('./factories/makeCreateAction');
 var _makeCreateStore = require('./factories/makeCreateStore');
-var _makeCreateView = require('./factories/makeCreateView');
 var _makeCreateAdapter = require('./factories/makeCreateAdapter');
 var _makeCreateHelper = require('./factories/makeCreateHelper');
 var _makeStart = require('./factories/makeStart');
@@ -40,7 +39,6 @@ module.exports = {
 
     var createAction = _makeCreateAction(_app);
     var createStore = _makeCreateStore(_app);
-    var createView = _makeCreateView(_app);
     var createAdapter = _makeCreateAdapter(_app);
     var createHelper = _makeCreateHelper(_app);
 
