@@ -62,9 +62,17 @@ module.exports = {
 
     _app.dispatcher = _createDispatcher(_app);
 
-    _.forEach(options.plugins, function(plugin){
-      _app.usePlugin(plugin);
-    });
+    if (options.plugins != null){
+      if (_.isArray(options.plugins)){
+        _.forEach(options.plugins, function(plugin){
+          _app.usePlugin(plugin);
+        });
+      } else if (_.isObject(options.plugins)){
+        _app.usePlugin(options.plugins);
+      } else {
+        throw new Error('"plugins" must be an array or an object');
+      }
+    }
 
     var app = _.omit(_app, ['dispatcher', 'debug', 'initializers', 'hasStarted', 'status', 'dispatcher', 'storeContexts']);
 
