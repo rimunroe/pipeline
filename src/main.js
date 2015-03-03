@@ -6,6 +6,7 @@ var _makeCreateAction = require('./factories/makeCreateAction');
 var _makeCreateStore = require('./factories/makeCreateStore');
 var _makeCreateAdapter = require('./factories/makeCreateAdapter');
 var _makeCreateHelper = require('./factories/makeCreateHelper');
+var _makeUsePlugin = require('./factories/makeUsePlugin');
 var _makeStart = require('./factories/makeStart');
 var _createDispatcher = require('./factories/createDispatcher');
 
@@ -61,7 +62,9 @@ module.exports = {
 
     _app.dispatcher = _createDispatcher(_app);
 
-    for (var plugin in options.plugin) _app.use(plugin);
+    _.forEach(options.plugins, function(plugin){
+      _app.usePlugin(plugin);
+    });
 
     var app = _.omit(_app, ['dispatcher', 'debug', 'initializers', 'hasStarted', 'status', 'dispatcher', 'storeContexts']);
 
