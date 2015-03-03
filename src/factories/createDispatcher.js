@@ -1,4 +1,6 @@
-var _createDispatcher = function (_app) {
+var _ = require('lodash');
+
+module.exports = function (_app) {
 
   var _dispatcher = {
     canDispatch: false,

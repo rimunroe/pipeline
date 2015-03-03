@@ -1,4 +1,6 @@
-var _handleMany = function (constructor) {
+var _ = require('lodash');
+
+module.exports = function (constructor) {
   return function (first, optional) {
     if (typeof first === 'string' && optional) {
       constructor.call(null, first, optional);

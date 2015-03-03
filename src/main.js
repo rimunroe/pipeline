@@ -1,4 +1,18 @@
-pipeline = {
+var _ = require('lodash');
+
+var _createStatus = require('./factories/createStatus');
+var _createLoad = require('./factories/createLoad');
+var _makeCreateAction = require('./factories/makeCreateAction');
+var _makeCreateStore = require('./factories/makeCreateStore');
+var _makeCreateView = require('./factories/makeCreateView');
+var _makeCreateAdapter = require('./factories/makeCreateAdapter');
+var _makeCreateHelper = require('./factories/makeCreateHelper');
+var _makeStart = require('./factories/makeStart');
+var _createDispatcher = require('./factories/createDispatcher');
+
+var _handleMany = require('./helpers/handleMany');
+
+module.exports = {
   createApp: function (options) {
     options = options || {};
 

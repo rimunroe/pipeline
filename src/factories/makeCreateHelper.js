@@ -1,4 +1,6 @@
-var _makeCreateHelper = function (_app) {
+var _ = require('lodash');
+
+module.exports = function (_app) {
   return function createHelper (helperName, fxn) {
     if (_app.hasStarted) {
       throw new Error("cannot create new helper \"" + helperName + "\". App has already started.");

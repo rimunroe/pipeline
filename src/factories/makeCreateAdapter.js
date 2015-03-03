@@ -1,4 +1,6 @@
-var _makeCreateAdapter = function (_app) {
+var _ = require('lodash');
+
+module.exports = function (_app) {
   return function createAdapter (adapterName, options) {
 
     var _adapter = {

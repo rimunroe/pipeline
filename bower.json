@@ -5,20 +5,15 @@
   "authors": [
     "Richard Munroe"
   ],
-  "main": "bower/pipeline.js",
+  "main": "pipeline.js",
   "moduleType": [
-    "globals",
     "node"
   ],
   "license": "MIT",
   "ignore": [
     "**/.*",
     "node_modules",
-    "dist",
-    "gulpfile.js",
-    "npm",
     "package.json",
-    "rails",
     "src"
   ],
   "dependencies": {

@@ -1,4 +1,6 @@
-var _createLoad = function (_app) {
+var _ = require('lodash');
+
+module.exports = function (_app) {
   return function (imports) {
     _.each(imports, function (val, key) {
       if (key === 'helpers') {

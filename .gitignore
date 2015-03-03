@@ -1,9 +1,8 @@
 node_modules/
 bower_components/
-dist/
 *.bundle
 *.so
 *.o
 *.a
-mkmf.log
 .DS_Store
+build/

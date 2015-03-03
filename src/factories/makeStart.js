@@ -1,4 +1,6 @@
-var _makeStart = function (_app) {
+var _ = require('lodash');
+
+module.exports = function (_app) {
 
   var _start = function () {
     _app.dispatcher.initialize();

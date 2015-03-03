@@ -1,4 +1,6 @@
-var _createStatus = function (_app) {
+var _ = require('lodash');
+
+module.exports = function (_app) {
 
   var _status = function _status (item) {
     if (item === 'stores') {
