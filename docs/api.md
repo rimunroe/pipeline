@@ -22,7 +22,7 @@ Optional function will be the last initialization function called after invoking
 
 #### options.plugins
 
-This is the set of plugins to use with pipeline.
+This is the set of [plugins](plugins.md) to use with pipeline.
 
 ## `App.create.action(name, packager)`
 

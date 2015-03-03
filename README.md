@@ -63,7 +63,7 @@ Adapters are created by specifying a name and a set of options. The options incl
 
 ## Plugins
 
-Pipeline can be extended through the use of plugins. The plugins API is still being fleshed out, but two example plugins have been created already:
+Pipeline can be extended through the use of plugins. The [plugins API](docs/plugins.md) is still being fleshed out, but two example plugins have been created already:
 
  - [pipeline-routing](https://github.com/rimunroe/pipeline-routing) - Routing and navigation with an action, a store, and an adapter.
  - [pipeline-react-views](https://github.com/rimunroe/pipeline-react-views) - Offers a shorthand for making React components which function as adapters.
