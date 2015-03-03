@@ -12,7 +12,7 @@ var _makeUsePlugin = function (_app) {
         var _creators = {};
 
         _.forEach(options.factories, function(factory, creatorName){
-          _.creators[creatorName] = factory.call(null, _app);
+          creators[creatorName] = factory.call(null, _app);
         });
 
         _.extend(_app.create, _creators);
