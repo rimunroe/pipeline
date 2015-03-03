@@ -60,3 +60,25 @@ Adapters are created by specifying a name and a set of options. The options incl
 ## Installation
 
 `bower install pipeline` or `npm install pipeline-flux`
+
+## Plugins
+
+Pipeline can be extended through the use of plugins. The plugins API is still being fleshed out, but two example plugins have been created already:
+
+ - [pipeline-routing](https://github.com/rimunroe/pipeline-routing) - Routing and navigation with an action, a store, and an adapter.
+ - [pipeline-react-views](https://github.com/rimunroe/pipeline-react-views) - Offers a shorthand for making React components which function as adapters.
+
+To use a plugin, pass them in on the options argument when you instantiate the app, like so:
+
+```javascript
+var pipeline = require(pipeline);
+var routing = require(pipeline-routing);
+var views = require(pipeline-react-views);
+
+var App = pipeline.createApp({
+  plugins: [
+    routing,
+    views
+  ]
+});
+```
