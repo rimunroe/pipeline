@@ -8,17 +8,21 @@ Returns a new pipeline app object.
 
 ```javascript
 {
-  initialize: Function // App initialization function.
+  initialize: Function, // App initialization function.
+  plugins: Array // Plugins to use.
 }
 ```
 
 #### options.initialize
 
-Optional function will be the last initialization function called after invoking
-App.start().
+Optional function will be the last initialization function called after invoking App.start().
 
 * `this.actions`: Object containing all the actions.
 * `this.stores`: Object containing all stores.
+
+#### options.plugins
+
+This is the set of plugins to use with pipeline.
 
 ## `App.create.action(name, packager)`
 
