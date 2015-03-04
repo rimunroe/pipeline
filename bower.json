@@ -3,7 +3,8 @@
   "version": "0.0.5",
   "homepage": "https://github.com/rimunroe/pipeline",
   "authors": [
-    "Richard Munroe"
+    "Richard Munroe",
+    "William Lubelski"
   ],
   "main": "pipeline.js",
   "moduleType": [
