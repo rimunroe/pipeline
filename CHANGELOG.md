@@ -1,8 +1,14 @@
 # Changelog
 
+## 0.0.6 - 2015-03-04
+
+- Fixed store resolution order
+- Added plugin support
+- Removed action packager functions and replaced with validators
+
 ## 0.0.5 - 2015-01-21
 
-- Removed CoffeeScript from project.
+- Removed CoffeeScript from project
 - `gulp watch` will no longer crash constantly on syntax errors
 - Better notifier messages for build errors
 - Added some test coverage (`npm test` to run)
