@@ -15,7 +15,7 @@ and *adapters*.
 
 Actions are the means by which data enters your system.
 
-Actions take arguments and carry a payload of data, which stores can inspect and respond to.
+Actions take arguments and optionally validate them. Their arguments are passed on to the callbacks of stores which listen to them.
 
 An app can only respond to one action at a time. Trying to send a new action while another is still being dispatched will result in the new action being deferred until the current dispatch is ended.
 
@@ -47,7 +47,7 @@ A view which renders data in response to a store is one type of adapter. Pipelin
 
 ### Actions
 
-An action is created by specifying a *name* and, optionally, a *packager*. The packager is a function which can be used to manipulate whatever data is supplied to the action,  so that the action is responsible for determining its own payload instead of the thing invoking it.
+An action is created by specifying a *name* and, optionally, a *validator*. The validator is a function which is used to validate the data the action carries.
 
 ### Stores
 

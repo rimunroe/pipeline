@@ -24,7 +24,7 @@ Optional function will be the last initialization function called after invoking
 
 This is the set of [plugins](plugins.md) to use with pipeline.
 
-## `App.create.action(name, packager)`
+## `App.create.action(name, validator)`
 
 Creates a new action in the app.
 
@@ -32,10 +32,24 @@ Creates a new action in the app.
 
 A string name for the action. All actions must have different names.
 
-### packager
+### validator
 
-A function that returns an object. All things that react to this action will
-take the return of this function as their argument.
+This function takes the arguments that the action will take and validates them, returning the result of the validation as an object. The object's keys are the names of the arguments, and the values are booleans representing whether or not the argument passed validation. Anything not on the object is unchecked (i.e. there is no restriction on its value).
+
+Example:
+
+```javascript
+app.create.action('foo', function(id, name, uncheckedArg){
+  return {
+    id: (0 < id) && (id < 100),
+    name: (typeof name === 'string') && (name.length > 0)
+  };
+});
+app.start();
+
+app.actions.foo(5, "Eve", "cantaloupe"); // fires normally
+app.actions.foo(5); // fails Eve's check and throws an error
+```
 
 ## `App.create.store(name, options)`
 
