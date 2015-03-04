@@ -94,10 +94,10 @@ module.exports = function (_app) {
       _dispatcher.changedStores[storeName] = true;
     },
 
-    dispatchAction: function (actionName, payload) {
+    dispatchAction: function (actionName, args) {
       if (_dispatcher.actionCallbacks[actionName] != null) {
         _.forEach(_dispatcher.actionCallbacks[actionName], function (cb) {
-          cb.callback(payload);
+          cb.callback.apply(null, args);
         });
       }
       for (var storeName in _dispatcher.changedStores) {
@@ -114,18 +114,18 @@ module.exports = function (_app) {
 
       for (var offset = 0; offset < _dispatcher.actionQueue.length; offset++) {
         var actionName = _dispatcher.actionQueue[offset].actionName;
-        var payload = _dispatcher.actionQueue[offset].payload;
+        var args = _dispatcher.actionQueue[offset].args;
 
-        _dispatcher.dispatchAction(actionName, payload);
+        _dispatcher.dispatchAction(actionName, args);
       }
 
       _dispatcher.actionQueue = [];
       _dispatcher.canDispatch = true;
     },
-    enqueueAction: function (actionName, payload) {
+    enqueueAction: function (actionName, args) {
       _dispatcher.actionQueue.push({
         actionName: actionName,
-        payload: payload
+        args: args
       });
       if (_dispatcher.canDispatch) {
         _dispatcher.dispatchActions();

@@ -1,13 +1,26 @@
 module.exports = function (_app) {
-  return function createAction (actionName, packager) {
+  var isValid = function(validationObject){
+
+  };
+
+  return function createAction (actionName, validator) {
     if (_app.hasStarted) {
       throw new Error("cannot create new action \"" + actionName + "\". App has already started.");
     }
 
     var action = function (){
-      var payload = packager.apply(null, arguments);
-      _app.dispatcher.enqueueAction(actionName, typeof payload === 'object' ? payload : {});
-      return payload ? true : false;
+      var validationObject = validator.apply(null, arguments);
+      var invalidArgs = [];
+
+      _.forEach(validationObject, function(isValidArg, key){
+        if (!isValidArg) invalidArgs.push(key);
+      });
+
+      if (!_.isEmpty(invalidArgs)){
+        throw new Error("Invalid values passed to action \"" + actionName + "\" as the following arguments: " + invalidArgs.join(" "));
+      }
+
+      _app.dispatcher.enqueueAction(actionName, arguments);
     };
 
     action.actionName = actionName;
