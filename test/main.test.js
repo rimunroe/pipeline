@@ -198,7 +198,6 @@ describe('While an app is running', function(){
       App.create.adapter('anAdapter', {
         stores: {
           aStore: function(){
-            // console.log(this.stores.aStore.get('val'));
             output = this.stores.aStore.get('val');
           }
         }
@@ -222,13 +221,11 @@ describe('While an app is running', function(){
       order = [];
 
       App.create.store('storeA', {
+        after: 'storeB',
         actions: {
-          newNumber: {
-            after: 'storeB',
-            action: function(payload){
-              order.push('storeA');
-              this.update('number', this.stores.storeB.get('number') * 2);
-            }
+          newNumber: function(payload){
+            order.push('storeA');
+            this.update('number', this.stores.storeB.get('number') * 2);
           }
         }
       });
@@ -274,13 +271,11 @@ describe('While an app is running', function(){
       order = [];
 
       App.create.store('A', {
+        after: 'B',
         actions: {
-          newNumber: {
-            after: 'B',
-            action: function(num){
-              order.push('A');
-              this.update('number', this.stores.B.get('number') * 2);
-            }
+          newNumber: function(num){
+            order.push('A');
+            this.update('number', this.stores.B.get('number') * 2);
           }
         }
       });
@@ -302,37 +297,31 @@ describe('While an app is running', function(){
       });
 
       App.create.store('B', {
+        after: ['D', 'E'],
         actions: {
-          newNumber: {
-            after: ['D', 'E'],
-            action: function(num){
-              order.push('B');
-              this.update('number', this.stores.D.get('number') * this.stores.E.get('number'));
-            }
+          newNumber: function(num){
+            order.push('B');
+            this.update('number', this.stores.D.get('number') * this.stores.E.get('number'));
           }
         }
       });
 
       App.create.store('C', {
+        after: ['F'],
         actions: {
-          newNumber: {
-            after: ['F'],
-            action: function(num){
-              order.push('C');
-              this.update({number: this.stores.F.get('number') * 3});
-            }
+          newNumber: function(num){
+            order.push('C');
+            this.update({number: this.stores.F.get('number') * 3});
           }
         }
       });
 
       App.create.store('D', {
+        after: ['F'],
         actions: {
-          newNumber: {
-            after: ['F'],
-            action: function(num){
-              order.push('D');
-              this.update({number: Math.pow(this.stores.F.get('number'), 2)});
-            }
+          newNumber: function(num){
+            order.push('D');
+            this.update({number: Math.pow(this.stores.F.get('number'), 2)});
           }
         }
       });
@@ -362,12 +351,10 @@ describe('While an app is running', function(){
       App2 = pipeline.createApp();
 
       App.create.store('storeA', {
+        after: 'storeB',
         actions: {
-          newNumber: {
-            after: 'storeB',
-            action: function(num){
-              this.update('number', this.stores.storeB.get('number') * 2);
-            }
+          newNumber: function(num){
+            this.update('number', this.stores.storeB.get('number') * 2);
           }
         }
       });
@@ -411,12 +398,10 @@ describe('While an app is running', function(){
       });
 
       App2.create.store('storeA', {
+        after: 'storeB',
         actions: {
-          newNumber: {
-            after: 'storeB',
-            action: function(num){
-              this.update('number', this.stores.storeB.get('number') * 2);
-            }
+          newNumber: function(num){
+            this.update('number', this.stores.storeB.get('number') * 2);
           }
         }
       });
