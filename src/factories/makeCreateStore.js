@@ -101,9 +101,8 @@ module.exports = function (_app) {
         callback = action.action;
       }
 
-      var fn = function (payload){
-        stores = _keyObj(waitFor, function (key){return _app.stores[key];});
-        callback.call(_context, payload, stores);
+      var fn = function (){
+        callback.apply(_context, arguments);
       };
 
       _app.dispatcher.onAction(storeName, actionName, waitFor, fn);

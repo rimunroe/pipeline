@@ -9,15 +9,17 @@ module.exports = function (_app) {
     }
 
     var action = function (){
-      var validationObject = validator.apply(null, arguments);
-      var invalidArgs = [];
+      if (_.isFunction(validator)){
+        var validationObject = validator.apply(null, arguments);
+        var invalidArgs = [];
 
-      _.forEach(validationObject, function(isValidArg, key){
-        if (!isValidArg) invalidArgs.push(key);
-      });
+        _.forEach(validationObject, function(isValidArg, key){
+          if (!isValidArg) invalidArgs.push(key);
+        });
 
-      if (!_.isEmpty(invalidArgs)){
-        throw new Error("Invalid values passed to action \"" + actionName + "\" as the following arguments: " + invalidArgs.join(" "));
+        if (!_.isEmpty(invalidArgs)){
+          throw new Error("Invalid values passed to action \"" + actionName + "\" as the following arguments: " + invalidArgs.join(" "));
+        }
       }
 
       _app.dispatcher.enqueueAction(actionName, arguments);
