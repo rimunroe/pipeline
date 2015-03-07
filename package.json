@@ -27,6 +27,9 @@
   "homepage": "https://github.com/rimunroe/pipeline",
   "devDependencies": {
     "chai": "^1.10.0",
+    "gulp": "^3.8.11",
+    "gulp-mocha": "^2.0.0",
+    "gulp-plumber": "^0.6.6",
     "mocha": "^2.1.0",
     "webpack": "^1.6.0"
   },
