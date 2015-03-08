@@ -1,5 +1,5 @@
 var chai = require('chai');
-var pipeline = require('../build/pipeline.js');
+var pipeline = require('../src/main.js');
 var should = chai.should();
 
 describe('While defining an app', function(){
