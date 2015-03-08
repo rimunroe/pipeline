@@ -223,7 +223,7 @@ describe('While an app is running', function(){
       App.create.store('storeA', {
         after: 'storeB',
         actions: {
-          newNumber: function(payload){
+          newNumber: function(number){
             order.push('storeA');
             this.update('number', this.stores.storeB.get('number') * 2);
           }

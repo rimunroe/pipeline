@@ -9,5 +9,5 @@ gulp.task('test', function(){
 });
 
 gulp.task('watch', ['test'], function(){
-  gulp.watch(['./build/pipeline.js', './test/main.test.js'], ['test']);
+  gulp.watch(['./src/**/*.js', './test/main.test.js'], ['test']);
 });
