@@ -86,7 +86,7 @@ module.exports = function (_app) {
 
     unregisterStoreCallback: function (storeName, callback, adapterName) {
       _.remove(_dispatcher.storeCallbacks[storeName], function (cb){
-        return (cb.callback === callback) && (cb.adapterName === adapterName);
+        return (cb.callback === callback);
       });
     },
 
