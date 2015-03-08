@@ -53,10 +53,13 @@ module.exports = function (_app) {
       _app.dispatcher.storeHasChanged(storeName);
     };
 
+    var availableStores = _keyObj(after, function (key){return _app.stores[key];});
+
     _.extend(_context, {
       actions: _app.actions,
       name: storeName,
       api: {},
+      stores: availableStores,
 
       get: function (key){
         return _.clone(key != null ? data[key] : data);
@@ -87,26 +90,11 @@ module.exports = function (_app) {
     });
 
     _.forEach(options.actions, function (action, actionName){
-      var waitFor;
-      var callback;
-
-      if (typeof action === 'function'){
-        waitFor = after;
-        callback = action;
-      } else {
-        if ((storeName === action.after) || (action.after.indexOf(storeName) >= 0)){
-          throw new Error("on action \"" + actionName + "\", store \"" + storeName + "\" waits for itself to update");
-        }
-        waitFor = _.unique(after.concat(action.after));
-        callback = action.action;
-      }
-
-      var fn = function (payload){
-        stores = _keyObj(waitFor, function (key){return _app.stores[key];});
-        callback.call(_context, payload, stores);
+      var fn = function (){
+        action.apply(_context, arguments);
       };
 
-      _app.dispatcher.onAction(storeName, actionName, waitFor, fn);
+      _app.dispatcher.onAction(storeName, actionName, after, fn);
     });
 
     if (_.isFunction(options.initialize)) {
