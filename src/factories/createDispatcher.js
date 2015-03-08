@@ -103,7 +103,7 @@ module.exports = function (_app) {
       for (var storeName in _dispatcher.changedStores) {
         if (_dispatcher.storeCallbacks[storeName] != null) {
           _.forEach(_dispatcher.storeCallbacks[storeName], function (cb) {
-            cb.callback();
+            if (cb != undefined) cb.callback();
           });
         }
       }
