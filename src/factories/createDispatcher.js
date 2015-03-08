@@ -12,6 +12,14 @@ module.exports = function (_app) {
 
   _.extend(_dispatcher, {
     initialize: function(){
+      _.forEach(_app.storeContexts, function(context, storeName){
+        if (context.stores != null) {
+          _.forEach(context.stores, function(store, name){
+            if (store == null) context.stores[name] = _app.stores[name];
+          });
+        }
+      });
+
       for (var actionName in _dispatcher.actionCallbacks){
         if (!_isDependencyMissing(actionName)) _sortDependencies(actionName);
         else throw new Error("Missing dependency for action \"" + actionName + "\"");
