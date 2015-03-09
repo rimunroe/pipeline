@@ -71,10 +71,10 @@ Pipeline can be extended through the use of plugins. The [plugins API](docs/plug
 To use a plugin, pass them in on the options argument when you instantiate the app, like so:
 
 ```javascript
-var pipeline = require(pipeline);
-var routing = require(pipeline-routing);
-var views = require(pipeline-react-views);
-var react = require(react);
+var pipeline = require('pipeline');
+var routing = require('pipeline-routing');
+var views = require('pipeline-react-views');
+var react = require('react');
 
 var app = pipeline.createApp({
   plugins: [
