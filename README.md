@@ -74,11 +74,12 @@ To use a plugin, pass them in on the options argument when you instantiate the a
 var pipeline = require(pipeline);
 var routing = require(pipeline-routing);
 var views = require(pipeline-react-views);
+var react = require(react);
 
-var App = pipeline.createApp({
+var app = pipeline.createApp({
   plugins: [
     routing,
-    views
+    views(react)
   ]
 });
 ```
