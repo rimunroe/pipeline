@@ -441,3 +441,43 @@ describe('Action validation', function(){
     sendBadArg.should.throw(errors.actions.failedValidation);
   });
 });
+
+describe('Unlistening dependencies', function(){
+  it('resolve correctly', function(){
+    var App = pipeline.createApp();
+
+    App.create.action('boop');
+    App.create.action('beep');
+    App.create.store('foo', {
+      actions: {
+        boop: function(num){
+          this.update('num', num);
+        }
+      }
+    });
+
+    App.create.store('bar', {
+      after: 'foo',
+      actions: {
+        beep: function(str){
+          this.update('str', str);
+        }
+      }
+    });
+
+    App.create.store('baz', {
+      after: ['bar'],
+      actions: {
+        beep: function(str){
+          this.update('str', str);
+        }
+      }
+    });
+
+    App.start();
+
+    App.actions.beep('hi');
+
+    App.stores.baz.get('str').should.equal('hi');
+  });
+});

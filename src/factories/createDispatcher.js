@@ -23,35 +23,37 @@ module.exports = function (_app) {
       });
 
       for (var actionName in _dispatcher.actionCallbacks){
-        if (!_isDependencyMissing(actionName)) _sortDependencies(actionName);
-        else throw new errors.dispatcher.missingDependency(actionName);
+        _sortDependencies(actionName);
       }
 
-      function _isDependencyMissing(actionName) {
-        return !_.every(_dispatcher.actionCallbacks[actionName], function(store) {
-          return _.every(store.after, function(dependency){
-            return _.find(_dispatcher.actionCallbacks[actionName], function(store){
-              return store.storeName === dependency;
-            });
-          });
-        });
-      }
-
-      // TODO make this section less terrible.
+      // TODO make this section WAY less terrible.
 
       function _sortDependencies(actionName){
         var unsorted = _dispatcher.actionCallbacks[actionName];
-        var sorted = _.filter(unsorted, function(action){return _.isEmpty(action.after);});
-        if (_.isEmpty(sorted)) throw new errors.dispatcher.cyclicDependency();
+        var unlisteningDependencies = [];
+        _.forEach(unsorted, function(action){
+          _.forEach(action.after, function(storeName){
+            var storeNames = _.pluck(_dispatcher.actionCallbacks[actionName], 'storeName');
+            if (storeNames.indexOf(storeName) === -1) unlisteningDependencies.push(storeName);
+          });
+        });
+
+        var sorted = _.filter(unsorted, function(action){
+          var noDependencies = _.isEmpty(_.difference(action.after, unlisteningDependencies));
+          if (noDependencies) return true;
+        });
+
         var sortedOrder = _.pluck(sorted, 'storeName');
         var working = _.difference(unsorted, sorted);
 
         var cyclic = true;
 
         var _dependenciesExist = function(dep){return sortedOrder.indexOf(dep) >= 0;};
-
+        var _dependencyDoesNotListen = function(dep){return unlisteningDependencies.indexOf(dep) >= 0;};
         var _removeDependenciesFromWorkingList = function(action){
-          if(_.every(action.after, _dependenciesExist)){
+          if(_.every(action.after, function(dep){
+            return _dependenciesExist(dep) || _dependencyDoesNotListen(dep);
+          })){
             cyclic = false;
             sorted.push(action);
             sortedOrder.push(action.storeName);
