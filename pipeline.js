@@ -11,41 +11,41 @@
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
-/******/
+
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
-/******/
+
 /******/ 		// Check if module is in cache
 /******/ 		if(installedModules[moduleId])
 /******/ 			return installedModules[moduleId].exports;
-/******/
+
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			exports: {},
 /******/ 			id: moduleId,
 /******/ 			loaded: false
 /******/ 		};
-/******/
+
 /******/ 		// Execute the module function
 /******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
+
 /******/ 		// Flag the module as loaded
 /******/ 		module.loaded = true;
-/******/
+
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/
-/******/
+
+
 /******/ 	// expose the modules object (__webpack_modules__)
 /******/ 	__webpack_require__.m = modules;
-/******/
+
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
-/******/
+
 /******/ 	// __webpack_public_path__
 /******/ 	__webpack_require__.p = "";
-/******/
+
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(0);
 /******/ })
@@ -54,19 +54,21 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var _ = __webpack_require__(11);
+	var _ = __webpack_require__(12);
 
-	var _createStatus = __webpack_require__(1);
-	var _createLoad = __webpack_require__(2);
-	var _makeCreateAction = __webpack_require__(3);
-	var _makeCreateStore = __webpack_require__(4);
-	var _makeCreateAdapter = __webpack_require__(5);
-	var _makeCreateHelper = __webpack_require__(6);
-	var _makeUsePlugin = __webpack_require__(7);
-	var _makeStart = __webpack_require__(8);
-	var _createDispatcher = __webpack_require__(9);
+	var errors = __webpack_require__(1);
 
-	var _handleMany = __webpack_require__(10);
+	var _createStatus = __webpack_require__(2);
+	var _createLoad = __webpack_require__(3);
+	var _makeCreateAction = __webpack_require__(4);
+	var _makeCreateStore = __webpack_require__(5);
+	var _makeCreateAdapter = __webpack_require__(6);
+	var _makeCreateHelper = __webpack_require__(7);
+	var _makeUsePlugin = __webpack_require__(8);
+	var _makeStart = __webpack_require__(9);
+	var _createDispatcher = __webpack_require__(10);
+
+	var _handleMany = __webpack_require__(11);
 
 	module.exports = {
 	  createApp: function (options) {
@@ -126,7 +128,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      } else if (_.isObject(options.plugins)){
 	        _app.usePlugin(options.plugins);
 	      } else {
-	        throw new Error('"plugins" must be an array or an object');
+	        throw new errors.badPluginsList();
 	      }
 	    }
 
@@ -147,7 +149,145 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var _ = __webpack_require__(11);
+	function BadPluginsList(){
+	  this.message = '"plugins" must be an array or an object.';
+	  var err = new Error();
+	  this.stack = err.stack;
+	}
+
+	BadPluginsList.prototype = Object.create(Error.prototype);
+	BadPluginsList.prototype.name = 'Bad Plugins List';
+
+	function NoPluginName(){
+	  this.message = 'Plugin must be named.';
+	  var err = new Error();
+	  this.stack = err.stack;
+	}
+
+	NoPluginName.prototype = Object.create(Error.prototype);
+	NoPluginName.prototype.name = 'No Plugin Name';
+
+	function BadPluginKey(pluginName, badKeys){
+	  this.message = 'Plugin \"' + pluginName + '\" attempts to overwrite the following keys on app.create: ' + badKeys.join(', ') + '.';
+	  var err = new Error();
+	  this.stack = err.stack;
+	}
+
+	BadPluginKey.prototype = Object.create(Error.prototype);
+	BadPluginKey.prototype.name = 'Bad Plugin Key';
+
+	function NoPluginObject(){
+	  this.message = 'No plugin object supplied.';
+	  var err = new Error();
+	  this.stack = err.stack;
+	}
+
+	NoPluginObject.prototype = Object.create(Error.prototype);
+	NoPluginObject.prototype.name = 'No Plugin Object';
+
+	function MissingDependency(actionName){
+	  this.message = 'Missing dependency for action \"' + actionName + '\".';
+	  var err = new Error();
+	  this.stack = err.stack;
+	}
+
+	MissingDependency.prototype = Object.create(Error.prototype);
+	MissingDependency.prototype.name = 'Missing Dependency';
+
+	function CyclicDependency(){
+	  this.message = 'There is a cyclic dependency in your app.';
+	  var err = new Error();
+	  this.stack = err.stack;
+	}
+
+	CyclicDependency.prototype = Object.create(Error.prototype);
+	CyclicDependency.prototype.name = 'Cyclic Dependency';
+
+	function ActionCreatedPostAppStart(actionName){
+	  this.message = 'Cannot create new action \"' + actionName + '\". App has already started.';
+	  var err = new Error();
+	  this.stack = err.stack;
+	}
+
+	ActionCreatedPostAppStart.prototype = Object.create(Error.prototype);
+	ActionCreatedPostAppStart.prototype.name = 'Action Created Post App Start';
+
+	function ActionValidationFailure(actionName){
+	  this.message = 'Invalid values passed to action \"' + actionName + '\". Aborting dispatch.';
+	  var err = new Error();
+	  this.stack = err.stack;
+	}
+
+	ActionValidationFailure.prototype = Object.create(Error.prototype);
+	ActionValidationFailure.prototype.name = 'Action Validation Failure';
+
+	function StoreCreatedPostAppStart(storeName){
+	  this.message = 'Cannot create new store \"' + storeName + '\". App has already started.';
+	  var err = new Error();
+	  this.stack = err.stack;
+	}
+
+	StoreCreatedPostAppStart.prototype = Object.create(Error.prototype);
+	StoreCreatedPostAppStart.prototype.name = 'Store Created Post-App Start';
+
+	function SelfWaitingStore(storeName){
+	  this.message = 'Store \"' + storeName + '\" waits for itself.';
+	  var err = new Error();
+	  this.stack = err.stack;
+	}
+
+	SelfWaitingStore.prototype = Object.create(Error.prototype);
+	SelfWaitingStore.prototype.name = 'Self Waiting Store';
+
+	function StoreUsedBadKeys(storeName, badKey){
+	  this.message = 'In \"' + storeName + '\" Store: \"' + badKey + '\" is a reserved key and cannot be used.';
+	  var err = new Error();
+	  this.stack = err.stack;
+	}
+
+	StoreUsedBadKeys.prototype = Object.create(Error.prototype);
+	StoreUsedBadKeys.prototype.name = 'Store Used Bad Keys';
+
+	function StoreUsedReservedAPIKey(name){
+	  this.message = 'API key \"' + name + '\" is a reserved key and cannot be used.';
+	  var err = new Error();
+	  this.stack = err.stack;
+	}
+
+	StoreUsedReservedAPIKey.prototype = Object.create(Error.prototype);
+	StoreUsedReservedAPIKey.prototype.name = 'Store Used Reserved API Key';
+
+	module.exports = {
+	  main: {
+	    badPluginsList: BadPluginsList
+	  },
+	  plugins: {
+	    noName: NoPluginName,
+	    badKeys: BadPluginKey,
+	    noPluginObject: NoPluginObject
+	  },
+	  dispatcher: {
+	    missingDependency: MissingDependency,
+	    cyclicDependency: CyclicDependency
+	  },
+	  actions: {
+	    appHasStarted: ActionCreatedPostAppStart,
+	    failedValidation: ActionValidationFailure
+	  },
+	  stores: {
+	    appHasStarted: StoreCreatedPostAppStart,
+	    waitingForSelf: SelfWaitingStore,
+	    usedBadKeys: StoreUsedBadKeys,
+	    usedReservedAPIKey: StoreUsedReservedAPIKey
+	  }
+	};
+
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var _ = __webpack_require__(12);
 
 	module.exports = function (_app) {
 
@@ -167,10 +307,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 2 */
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var _ = __webpack_require__(11);
+	var _ = __webpack_require__(12);
 
 	module.exports = function (_app) {
 	  return function (imports) {
@@ -196,32 +336,44 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 3 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = function (_app) {
-	  var isValid = function(validationObject){
+	var _ = __webpack_require__(12);
 
-	  };
+	var errors = __webpack_require__(1);
+
+	module.exports = function (_app) {
 
 	  return function createAction (actionName, validator) {
 	    if (_app.hasStarted) {
-	      throw new Error("cannot create new action \"" + actionName + "\". App has already started.");
+	      throw new errors.actions.appHasStarted(actionName);
 	    }
 
-	    var action = function (){
-	      var validationObject = validator.apply(null, arguments);
-	      var invalidArgs = [];
+	    var action = function () {
+	      var valid = true;
+	      var validatorMessages = [];
 
-	      _.forEach(validationObject, function(isValidArg, key){
-	        if (!isValidArg) invalidArgs.push(key);
-	      });
-
-	      if (!_.isEmpty(invalidArgs)){
-	        throw new Error("Invalid values passed to action \"" + actionName + "\" as the following arguments: " + invalidArgs.join(" "));
+	      if (_.isFunction(validator)) {
+	        var _context = {
+	          require: function(isValidArgument, message) {
+	            if (!isValidArgument){
+	              valid = false;
+	              if (message != null) validatorMessages.push(message);
+	            }
+	          }
+	        };
+	        validator.apply(_context, arguments);
 	      }
 
-	      _app.dispatcher.enqueueAction(actionName, arguments);
+	      if (!valid) {
+	        _.forEach(validatorMessages, function(message){
+	          console.log(message);
+	        });
+	        throw new errors.actions.failedValidation(actionName);
+	      } else {
+	        _app.dispatcher.enqueueAction(actionName, arguments);
+	      }
 	    };
 
 	    action.actionName = actionName;
@@ -235,10 +387,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 4 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var _ = __webpack_require__(11);
+	var _ = __webpack_require__(12);
+
+	var errors = __webpack_require__(1);
 
 	module.exports = function (_app) {
 
@@ -253,7 +407,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  return function createStore (storeName, options){
 	    if (_app.hasStarted) {
-	      throw new Error("cannot create new store \"" + storeName + "\". App has already started.");
+	      throw new errors.stores.appHasStarted(storeName);
 	    }
 	    var data = {};
 
@@ -273,12 +427,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      after = [];
 	    }
 
-	    if (after.indexOf(storeName) >= 0) throw new Error("store \"" + storeName + "\" waits for itself");
+	    if (after.indexOf(storeName) >= 0) throw new errors.stores.waitingForSelf(storeName);
 	    var reservedKeys = ['name', 'stores', 'get', 'update'];
 	    var badKeys = _.intersection(_.keys(options), reservedKeys);
 
 	    if (!_.isEmpty(badKeys)) _.each(badKeys, function (badKey) {
-	      throw new Error("In \"" + storeName + "\" Store: \"" + badKey + "\" is a reserved key and cannot be used.");
+	      throw new errors.stores.usedBadKeys(storeName, badKey);
 	    });
 
 	    var _context = _.omit(options, ['initialize', 'api', 'actions']);
@@ -293,10 +447,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      _app.dispatcher.storeHasChanged(storeName);
 	    };
 
+	    var availableStores = _keyObj(after, function (key){return _app.stores[key];});
+
 	    _.extend(_context, {
 	      actions: _app.actions,
 	      name: storeName,
 	      api: {},
+	      stores: availableStores,
 
 	      get: function (key){
 	        return _.clone(key != null ? data[key] : data);
@@ -318,7 +475,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // todo:  check for colliding public and private methods
 
 	      if (_.contains(reservedKeys, name)) {
-	        throw new Error("API key \"" + name + "\" is a reserved key and cannot be used.");
+	        throw new errors.stores.usedReservedAPIKey(name);
 	      }
 
 	      var cb = callback.bind(_context);
@@ -327,26 +484,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 
 	    _.forEach(options.actions, function (action, actionName){
-	      var waitFor;
-	      var callback;
-
-	      if (typeof action === 'function'){
-	        waitFor = after;
-	        callback = action;
-	      } else {
-	        if ((storeName === action.after) || (action.after.indexOf(storeName) >= 0)){
-	          throw new Error("on action \"" + actionName + "\", store \"" + storeName + "\" waits for itself to update");
-	        }
-	        waitFor = _.unique(after.concat(action.after));
-	        callback = action.action;
-	      }
-
-	      var fn = function (payload){
-	        stores = _keyObj(waitFor, function (key){return _app.stores[key];});
-	        callback.call(_context, payload, stores);
+	      var fn = function (){
+	        action.apply(_context, arguments);
 	      };
 
-	      _app.dispatcher.onAction(storeName, actionName, waitFor, fn);
+	      _app.dispatcher.onAction(storeName, actionName, after, fn);
 	    });
 
 	    if (_.isFunction(options.initialize)) {
@@ -367,10 +509,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var _ = __webpack_require__(11);
+	var _ = __webpack_require__(12);
 
 	module.exports = function (_app) {
 	  return function createAdapter (adapterName, options) {
@@ -405,10 +547,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var _ = __webpack_require__(11);
+	var _ = __webpack_require__(12);
 
 	module.exports = function (_app) {
 	  return function createHelper (helperName, fxn) {
@@ -447,20 +589,22 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
+
+	var errors = __webpack_require__(1);
 
 	module.exports = function (_app) {
 	  return function (options) {
 	    if (options != null) {
 	      var pluginName = options.name;
 
-	      if (pluginName == null) throw new Error("Plugin must be named");
+	      if (pluginName == null) throw new errors.plugin.noName();
 
 	      if (typeof options.factories === 'object') {
 	        var badKeys = _.intersection(_.keys(options.factories), _.keys(_app.create));
 	        if (!_.isEmpty(badKeys)) {
-	          throw new Error("Plugin \"" + pluginName + "\" attempts to overwrite the following keys on app.create: " + badKeys.join(', '));
+	          throw new errors.plugins.badKeys(pluginName, badKeys);
 	        }
 	        var _creators = {};
 
@@ -474,16 +618,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (typeof options.startHook === 'function') {
 	        _app.startHooks[pluginName] = options.startHook;
 	      }
-	    } else throw new Error("No plugin object supplied.");
+	    } else throw new errors.plugins.noPluginObject();
 	  };
 	};
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var _ = __webpack_require__(11);
+	var _ = __webpack_require__(12);
 
 	module.exports = function (_app) {
 
@@ -528,10 +672,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var _ = __webpack_require__(11);
+	var _ = __webpack_require__(12);
+
+	var errors = __webpack_require__(1);
 
 	module.exports = function (_app) {
 
@@ -545,9 +691,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  _.extend(_dispatcher, {
 	    initialize: function(){
+	      _.forEach(_app.storeContexts, function(context, storeName){
+	        if (context.stores != null) {
+	          _.forEach(context.stores, function(store, name){
+	            if (store == null) context.stores[name] = _app.stores[name];
+	          });
+	        }
+	      });
+
 	      for (var actionName in _dispatcher.actionCallbacks){
 	        if (!_isDependencyMissing(actionName)) _sortDependencies(actionName);
-	        else throw new Error("Missing dependency for action \"" + actionName + "\"");
+	        else throw new errors.dispatcher.missingDependency(actionName);
 	      }
 
 	      function _isDependencyMissing(actionName) {
@@ -565,7 +719,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      function _sortDependencies(actionName){
 	        var unsorted = _dispatcher.actionCallbacks[actionName];
 	        var sorted = _.filter(unsorted, function(action){return _.isEmpty(action.after);});
-	        if (_.isEmpty(sorted)) throw new Error("Cyclic dependency");
+	        if (_.isEmpty(sorted)) throw new errors.dispatcher.cyclicDependency();
 	        var sortedOrder = _.pluck(sorted, 'storeName');
 	        var working = _.difference(unsorted, sorted);
 
@@ -586,7 +740,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	          working.forEach(_removeDependenciesFromWorkingList);
 
-	          if(cyclic) throw new Error("Cyclic dependency");
+	          if(cyclic) throw new errors.dispatcher.cyclicDependency();
 
 	          working = _.difference(working, sorted);
 	        }
@@ -619,7 +773,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    unregisterStoreCallback: function (storeName, callback, adapterName) {
 	      _.remove(_dispatcher.storeCallbacks[storeName], function (cb){
-	        return (cb.callback === callback) && (cb.adapterName === adapterName);
+	        return (cb.callback === callback);
 	      });
 	    },
 
@@ -636,7 +790,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      for (var storeName in _dispatcher.changedStores) {
 	        if (_dispatcher.storeCallbacks[storeName] != null) {
 	          _.forEach(_dispatcher.storeCallbacks[storeName], function (cb) {
-	            cb.callback();
+	            if (cb != undefined) cb.callback();
 	          });
 	        }
 	      }
@@ -678,10 +832,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var _ = __webpack_require__(11);
+	var _ = __webpack_require__(12);
 
 	module.exports = function (constructor) {
 	  return function (first, optional) {
@@ -697,7 +851,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/**
@@ -7857,11 +8011,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    root._ = _;
 	  }
 	}.call(this));
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12)(module), (function() { return this; }())))
+
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13)(module), (function() { return this; }())))
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function(module) {
@@ -7879,3 +8033,4 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ }
 /******/ ])
 });
+;
