@@ -422,3 +422,22 @@ describe('While an app is running', function(){
   });
 
 });
+
+describe('Action validation', function(){
+
+  it('should throw when trying to send the action without meeting a requirement', function(){
+    App = pipeline.createApp();
+
+    App.create.action('foo', function(number){
+      this.require((number != null), 'number was not provided');
+    });
+
+    App.start();
+
+    var sendBadArg = function(){
+      App.actions.foo();
+    };
+
+    sendBadArg.should.throw(errors.actions.failedValidation);
+  });
+});

@@ -61,8 +61,8 @@ function ActionCreatedPostAppStart(actionName){
 ActionCreatedPostAppStart.prototype = Object.create(Error.prototype);
 ActionCreatedPostAppStart.prototype.name = 'Action Created Post App Start';
 
-function ActionValidationFailure(actionName, invlaidArgs){
-  this.message = 'Invalid values passed to action \"' + actionName + '\" as the following arguments: ' + invalidArgs.join(' ') + '.';
+function ActionValidationFailure(actionName){
+  this.message = 'Invalid values passed to action \"' + actionName + '\". Aborting dispatch.';
   var err = new Error();
   this.stack = err.stack;
 }

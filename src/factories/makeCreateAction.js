@@ -3,30 +3,36 @@ var _ = require('lodash');
 var errors = require('../errors');
 
 module.exports = function (_app) {
-  var isValid = function(validationObject){
-
-  };
 
   return function createAction (actionName, validator) {
     if (_app.hasStarted) {
       throw new errors.actions.appHasStarted(actionName);
     }
 
-    var action = function (){
-      if (_.isFunction(validator)){
-        var validationObject = validator.apply(null, arguments);
-        var invalidArgs = [];
+    var action = function () {
+      var valid = true;
+      var validatorMessages = [];
 
-        _.forEach(validationObject, function(isValidArg, key){
-          if (!isValidArg) invalidArgs.push(key);
-        });
-
-        if (!_.isEmpty(invalidArgs)){
-          throw new errors.action.failedValidation();
-        }
+      if (_.isFunction(validator)) {
+        var _context = {
+          require: function(isValidArgument, message) {
+            if (!isValidArgument){
+              valid = false;
+              if (message != null) validatorMessages.push(message);
+            }
+          }
+        };
+        validator.apply(_context, arguments);
       }
 
-      _app.dispatcher.enqueueAction(actionName, arguments);
+      if (!valid) {
+        _.forEach(validatorMessages, function(message){
+          console.log(message);
+        });
+        throw new errors.actions.failedValidation(actionName);
+      } else {
+        _app.dispatcher.enqueueAction(actionName, arguments);
+      }
     };
 
     action.actionName = actionName;
