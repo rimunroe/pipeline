@@ -2,7 +2,7 @@
   "name": "pipeline-flux",
   "version": "0.1.0",
   "description": "A tiny Flux framework with strong opinions",
-  "main": "pipeline.js",
+  "main": "src/main.js",
   "scripts": {
     "test": "mocha",
     "build": "webpack && webpack --config webpack.config.min.js"
