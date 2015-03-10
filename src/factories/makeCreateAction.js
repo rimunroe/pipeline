@@ -1,5 +1,7 @@
 var _ = require('lodash');
 
+var errors = require('../errors');
+
 module.exports = function (_app) {
   var isValid = function(validationObject){
 
@@ -7,7 +9,7 @@ module.exports = function (_app) {
 
   return function createAction (actionName, validator) {
     if (_app.hasStarted) {
-      throw new Error("cannot create new action \"" + actionName + "\". App has already started.");
+      throw new errors.actions.appHasStarted(actionName);
     }
 
     var action = function (){
@@ -20,7 +22,7 @@ module.exports = function (_app) {
         });
 
         if (!_.isEmpty(invalidArgs)){
-          throw new Error("Invalid values passed to action \"" + actionName + "\" as the following arguments: " + invalidArgs.join(" "));
+          throw new errors.action.failedValidation();
         }
       }
 

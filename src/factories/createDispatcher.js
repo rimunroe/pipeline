@@ -1,5 +1,7 @@
 var _ = require('lodash');
 
+var errors = require('../errors');
+
 module.exports = function (_app) {
 
   var _dispatcher = {
@@ -22,7 +24,7 @@ module.exports = function (_app) {
 
       for (var actionName in _dispatcher.actionCallbacks){
         if (!_isDependencyMissing(actionName)) _sortDependencies(actionName);
-        else throw new Error("Missing dependency for action \"" + actionName + "\"");
+        else throw new errors.dispatcher.missingDependency(actionName);
       }
 
       function _isDependencyMissing(actionName) {
@@ -40,7 +42,7 @@ module.exports = function (_app) {
       function _sortDependencies(actionName){
         var unsorted = _dispatcher.actionCallbacks[actionName];
         var sorted = _.filter(unsorted, function(action){return _.isEmpty(action.after);});
-        if (_.isEmpty(sorted)) throw new Error("Cyclic dependency");
+        if (_.isEmpty(sorted)) throw new errors.dispatcher.cyclicDependency();
         var sortedOrder = _.pluck(sorted, 'storeName');
         var working = _.difference(unsorted, sorted);
 
@@ -61,7 +63,7 @@ module.exports = function (_app) {
 
           working.forEach(_removeDependenciesFromWorkingList);
 
-          if(cyclic) throw new Error("Cyclic dependency");
+          if(cyclic) throw new errors.dispatcher.cyclicDependency();
 
           working = _.difference(working, sorted);
         }

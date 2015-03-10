@@ -1,5 +1,8 @@
 var chai = require('chai');
-var pipeline = require('../src/main.js');
+
+var pipeline = require('../src/main');
+var errors = require('../src/errors');
+
 var should = chai.should();
 
 describe('While defining an app', function(){
@@ -84,7 +87,7 @@ describe('While starting an app', function(){
         });
       };
 
-      createSelfReferencingStore.should.throw(Error);
+      createSelfReferencingStore.should.throw(errors.stores.waitingForSelf);
 
     });
 
@@ -97,7 +100,7 @@ describe('While starting an app', function(){
           }
         });
       };
-      createStoreWithBadAPIKeys.should.throw(Error);
+      createStoreWithBadAPIKeys.should.throw(errors.stores.usedReservedAPIKey);
 
     });
 
@@ -119,7 +122,7 @@ describe('While starting an app', function(){
           }
         });
 
-        App.start.should.throw(Error);
+        App.start.should.throw(errors.dispatcher.cyclicDependency);
 
       });
 
@@ -146,7 +149,7 @@ describe('While starting an app', function(){
           }
         });
 
-        App.start.should.throw(Error);
+        App.start.should.throw(errors.dispatcher.cyclicDependency);
 
       });
     });

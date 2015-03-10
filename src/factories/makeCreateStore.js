@@ -1,5 +1,7 @@
 var _ = require('lodash');
 
+var errors = require('../errors');
+
 module.exports = function (_app) {
 
   var _keyObj = function(array, callback){
@@ -13,7 +15,7 @@ module.exports = function (_app) {
 
   return function createStore (storeName, options){
     if (_app.hasStarted) {
-      throw new Error("cannot create new store \"" + storeName + "\". App has already started.");
+      throw new errors.stores.appHasStarted(storeName);
     }
     var data = {};
 
@@ -33,12 +35,12 @@ module.exports = function (_app) {
       after = [];
     }
 
-    if (after.indexOf(storeName) >= 0) throw new Error("store \"" + storeName + "\" waits for itself");
+    if (after.indexOf(storeName) >= 0) throw new errors.stores.waitingForSelf(storeName);
     var reservedKeys = ['name', 'stores', 'get', 'update'];
     var badKeys = _.intersection(_.keys(options), reservedKeys);
 
     if (!_.isEmpty(badKeys)) _.each(badKeys, function (badKey) {
-      throw new Error("In \"" + storeName + "\" Store: \"" + badKey + "\" is a reserved key and cannot be used.");
+      throw new errors.stores.usedBadKeys(storeName, badKey);
     });
 
     var _context = _.omit(options, ['initialize', 'api', 'actions']);
@@ -81,7 +83,7 @@ module.exports = function (_app) {
       // todo:  check for colliding public and private methods
 
       if (_.contains(reservedKeys, name)) {
-        throw new Error("API key \"" + name + "\" is a reserved key and cannot be used.");
+        throw new errors.stores.usedReservedAPIKey(name);
       }
 
       var cb = callback.bind(_context);

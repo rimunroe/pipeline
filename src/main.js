@@ -1,5 +1,7 @@
 var _ = require('lodash');
 
+var errors = require('./errors');
+
 var _createStatus = require('./factories/createStatus');
 var _createLoad = require('./factories/createLoad');
 var _makeCreateAction = require('./factories/makeCreateAction');
@@ -70,7 +72,7 @@ module.exports = {
       } else if (_.isObject(options.plugins)){
         _app.usePlugin(options.plugins);
       } else {
-        throw new Error('"plugins" must be an array or an object');
+        throw new errors.badPluginsList();
       }
     }
 
