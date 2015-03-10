@@ -15,7 +15,7 @@ Returns a new pipeline app object.
 
 #### options.initialize
 
-Optional function will be the last initialization function called after invoking App.start().
+Optional function will be the last initialization function called after invoking app.start().
 
 * `this.actions`: Object containing all the actions.
 * `this.stores`: Object containing all stores.
@@ -24,7 +24,7 @@ Optional function will be the last initialization function called after invoking
 
 This is the set of [plugins](plugins.md) to use with pipeline.
 
-## `App.create.action(name, validator)`
+## `app.create.action(name, validator)`
 
 Creates a new action in the app.
 
@@ -34,24 +34,22 @@ A string name for the action. All actions must have different names.
 
 ### validator
 
-This function takes the arguments that the action will take and validates them, returning the result of the validation as an object. The object's keys are the names of the arguments, and the values are booleans representing whether or not the argument passed validation. Anything not on the object is unchecked (i.e. there is no restriction on its value).
+This function takes the arguments that the action will take and validates them. The validation is done by calling `this.require` in the validation function, passing in some expression which evaluates to a boolean signifying the acceptance of the value (`true`) or its rejection (`false`), as well as a message that will be printed if the first argument to `require` is false.
 
 Example:
 
 ```javascript
 app.create.action('foo', function(id, name, uncheckedArg){
-  return {
-    id: (0 < id) && (id < 100),
-    name: (typeof name === 'string') && (name.length > 0)
-  };
+  this.require(id != null, '"id" is a required argument');
+  this.require(typeof name === string, '"name" must be a string');
 });
 app.start();
 
 app.actions.foo(5, "Eve", "cantaloupe"); // fires normally
-app.actions.foo(5); // fails Eve's check and throws an error
+app.actions.foo(5, 5); // fails Eve's check and throws an error
 ```
 
-## `App.create.store(name, options)`
+## `app.create.store(name, options)`
 
 ### name
 
@@ -109,7 +107,7 @@ These functions will be available to anything with a reference to the store.
 }
 ```
 
-## `App.create.adapter(name, options)`
+## `app.create.adapter(name, options)`
 
 ### name
 
