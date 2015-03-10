@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.0 - 2015-03-09
+
+- Changed the way validators work to follow discussion of issue #13
+- Store callbacks work now regardless of declaration order
+- Some improvements to testing and the build stack
+
 ## 0.0.6 - 2015-03-04
 
 - Fixed store resolution order
