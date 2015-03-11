@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1 - 2015-03-10
+
+- Removed lodash from pipeline.js
+- Corrected package.json to point at the correct file for CommonJS loading
+- If a dependended-on store does not listen to an action a depending store lists a callback for, the dispatcher will no longer throw a fit
+
 ## 0.1.0 - 2015-03-09
 
 - Changed the way validators work to follow discussion of issue #13
