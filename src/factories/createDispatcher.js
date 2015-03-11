@@ -48,11 +48,12 @@ module.exports = function (_app) {
 
         var cyclic = true;
 
-        var _dependenciesExist = function(dep){return sortedOrder.indexOf(dep) >= 0;};
-        var _dependencyDoesNotListen = function(dep){return unlisteningDependencies.indexOf(dep) >= 0;};
+        var _shouldAddToList = function(dep){
+          return sortedOrder.indexOf(dep) >= 0 || unlisteningDependencies.indexOf(dep) >= 0;
+        };
         var _removeDependenciesFromWorkingList = function(action){
           if(_.every(action.after, function(dep){
-            return _dependenciesExist(dep) || _dependencyDoesNotListen(dep);
+            return _shouldAddToList(dep);
           })){
             cyclic = false;
             sorted.push(action);
