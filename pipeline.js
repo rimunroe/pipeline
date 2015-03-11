@@ -1,12 +1,12 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("lodash"));
+		module.exports = factory(require("_"));
 	else if(typeof define === 'function' && define.amd)
-		define(["lodash"], factory);
+		define(["_"], factory);
 	else if(typeof exports === 'object')
-		exports["pipeline"] = factory(require("lodash"));
+		exports["pipeline"] = factory(require("_"));
 	else
-		root["pipeline"] = factory(root["lodash"]);
+		root["pipeline"] = factory(root["_"]);
 })(this, function(__WEBPACK_EXTERNAL_MODULE_1__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
