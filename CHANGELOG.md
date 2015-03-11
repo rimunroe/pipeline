@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2 - 2015-03-11
+
+- Fixed the lodash dependency of the built version
+
 ## 0.1.1 - 2015-03-10
 
 - Removed lodash from pipeline.js
