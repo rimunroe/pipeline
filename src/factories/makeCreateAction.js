@@ -29,7 +29,6 @@ module.exports = function (_app) {
         _.forEach(validatorMessages, function(message){
           console.log(message);
         });
-        throw new errors.actions.failedValidation(actionName);
       } else {
         _app.dispatcher.enqueueAction(actionName, arguments);
       }
