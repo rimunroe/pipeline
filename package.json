@@ -1,6 +1,6 @@
 {
   "name": "pipeline-flux",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A tiny Flux framework with strong opinions",
   "main": "src/main.js",
   "scripts": {

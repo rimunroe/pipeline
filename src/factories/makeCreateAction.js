@@ -22,14 +22,18 @@ module.exports = function (_app) {
             }
           }
         };
-        validator.apply(_context, arguments);
+        try {
+          validator.apply(_context, arguments);
+        } catch(e) {
+          valid = false;
+          console.log('An error was thrown in the validator for action "' + actionName + '"');
+        }
       }
 
       if (!valid) {
         _.forEach(validatorMessages, function(message){
           console.log(message);
         });
-        throw new errors.actions.failedValidation(actionName);
       } else {
         _app.dispatcher.enqueueAction(actionName, arguments);
       }

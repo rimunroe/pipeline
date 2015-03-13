@@ -428,17 +428,32 @@ describe('Action validation', function(){
   it('should throw when trying to send the action without meeting a requirement', function(){
     App = pipeline.createApp();
 
-    App.create.action('foo', function(number){
+    App.create.action('foo', function(number, string){
       this.require((number != null), 'number was not provided');
+    });
+
+    App.create.store('aStore', {
+      initialize: function(){
+        this.update({
+          number: 2,
+          string: 'hello'
+        });
+      },
+      actions: {
+        foo: function(number, string){
+          this.update({
+            number: number,
+            string: string
+          });
+        }
+      }
     });
 
     App.start();
 
-    var sendBadArg = function(){
-      App.actions.foo();
-    };
+    App.actions.foo(null, 'hello');
 
-    sendBadArg.should.throw(errors.actions.failedValidation);
+    result = App.stores.aStore.get('string').should.equal('hello');
   });
 });
 

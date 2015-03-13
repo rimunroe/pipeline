@@ -369,14 +369,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	          }
 	        };
-	        validator.apply(_context, arguments);
+	        try {
+	          validator.apply(_context, arguments);
+	        } catch(e) {
+	          valid = false;
+	          console.log('An error was thrown in the validator for action "' + actionName + '"');
+	        }
 	      }
 
 	      if (!valid) {
 	        _.forEach(validatorMessages, function(message){
 	          console.log(message);
 	        });
-	        throw new errors.actions.failedValidation(actionName);
 	      } else {
 	        _app.dispatcher.enqueueAction(actionName, arguments);
 	      }
@@ -731,11 +735,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        var cyclic = true;
 
-	        var _dependenciesExist = function(dep){return sortedOrder.indexOf(dep) >= 0;};
-	        var _dependencyDoesNotListen = function(dep){return unlisteningDependencies.indexOf(dep) >= 0;};
+	        var _shouldAddToList = function(dep){
+	          return sortedOrder.indexOf(dep) >= 0 || unlisteningDependencies.indexOf(dep) >= 0;
+	        };
 	        var _removeDependenciesFromWorkingList = function(action){
 	          if(_.every(action.after, function(dep){
-	            return _dependenciesExist(dep) || _dependencyDoesNotListen(dep);
+	            return _shouldAddToList(dep);
 	          })){
 	            cyclic = false;
 	            sorted.push(action);

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3 - 2015-03-12
+
+- Errors in action validator functions are now caught and a warning is logged
+
 ## 0.1.2 - 2015-03-11
 
 - Fixed the lodash dependency of the built version
