@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.4 - 2015-03-16
+
+- Switched to bundling a custom built version of lodash using the [lodash-cli](http://github.com/lodash/lodash-cli) and removed lodash from the list of dependencies
+
 ## 0.1.3 - 2015-03-12
 
 - Errors in action validator functions are now caught and a warning is logged
