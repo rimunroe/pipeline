@@ -32,8 +32,5 @@
     "gulp-plumber": "^0.6.6",
     "mocha": "^2.1.0",
     "webpack": "^1.6.0"
-  },
-  "dependencies": {
-    "lodash": "^2.4.1"
   }
 }

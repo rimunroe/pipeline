@@ -1,4 +1,4 @@
-var errors = require('../errors');
+var _ = require('../lib/lodash');
 
 module.exports = function (_app) {
   return function (options) {

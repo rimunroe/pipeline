@@ -8,6 +8,5 @@ module.exports = {
     libraryTarget: "umd",
     library: "pipeline"
   },
-  externals: {lodash: '_'},
   plugins: []
 };

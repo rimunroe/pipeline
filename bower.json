@@ -17,9 +17,6 @@
     "package.json",
     "src"
   ],
-  "dependencies": {
-    "lodash": "~2.4.1"
-  },
   "keywords": [
     "flux"
   ]

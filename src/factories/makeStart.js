@@ -1,4 +1,4 @@
-var _ = require('lodash');
+var _ = require('../lib/lodash');
 
 module.exports = function (_app) {
 
